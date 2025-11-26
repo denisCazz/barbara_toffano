@@ -1,0 +1,143 @@
+---
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="it">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Servizi astrologici e magici" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
+	</head>
+	<body>
+        <div class="background-overlay"></div>
+        <div class="fog-container">
+            <div class="fog-img fog-img-first"></div>
+            <div class="fog-img fog-img-second"></div>
+        </div>
+		<slot />
+	</body>
+</html>
+<style is:global>
+	:root {
+		--accent: #9d4edd;
+		--accent-light: #e0aaff;
+		--accent-dark: #240046;
+		--background: #0a0a0f;
+        --text-color: #e2e2e2;
+        --gold: #d4af37;
+        --gold-light: #f4e4bc;
+        --gold-dark: #aa8c2c;
+	}
+	html {
+		font-family: 'Cormorant Garamond', serif;
+		background: var(--background);
+        min-height: 100vh;
+        color: var(--text-color);
+        scroll-behavior: smooth;
+        font-size: 18px;
+	}
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Cinzel', serif;
+        color: var(--gold);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+    .script-font {
+        font-family: 'Great Vibes', cursive;
+        color: var(--accent-light);
+    }
+    body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        position: relative;
+        min-height: 100vh;
+        background: radial-gradient(circle at 50% 0%, #1a0b2e 0%, #000000 100%);
+    }
+    
+    .background-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        background-image: 
+            radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+            radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+            radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+        background-size: 550px 550px, 350px 350px, 250px 250px;
+        background-position: 0 0, 40px 60px, 130px 270px;
+        opacity: 0.8;
+    }
+
+    /* Fog Animation */
+    .fog-container {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    .fog-img {
+        position: absolute;
+        height: 100vh;
+        width: 300vw;
+        z-index: 1;
+        opacity: 0.3;
+        background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/img/fog1.png') repeat-x;
+        background-size: contain;
+        animation: fog 60s linear infinite;
+    }
+    .fog-img-second {
+        background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/img/fog2.png') repeat-x;
+        background-size: contain;
+        animation: fog 40s linear infinite;
+        z-index: 2;
+        top: 30%;
+    }
+
+    @keyframes fog {
+        0% { transform: translate3d(0, 0, 0); }
+        100% { transform: translate3d(-200vw, 0, 0); }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #050505; 
+    }
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(to bottom, var(--accent-dark), var(--gold-dark)); 
+        border-radius: 4px;
+    }
+    
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+    
+    /* Selection */
+    ::selection {
+        background: var(--gold);
+        color: black;
+    }
+</style>

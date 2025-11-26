@@ -1,0 +1,116 @@
+---
+interface Props {
+	title: string;
+	description: string;
+    icon?: string;
+}
+
+const { title, description, icon = "✨" } = Astro.props;
+---
+
+<div class="card-wrapper">
+    <div class="card">
+        <div class="icon-wrapper">
+            <div class="icon">{icon}</div>
+        </div>
+        <h3>{title}</h3>
+        <div class="divider"></div>
+        <p>{description}</p>
+        <button>Scopri di più</button>
+    </div>
+</div>
+
+<style>
+    .card-wrapper {
+        padding: 2px;
+        background: linear-gradient(45deg, transparent, var(--gold-dark), transparent);
+        border-radius: 15px;
+        height: 100%;
+        transition: transform 0.4s ease;
+    }
+    .card-wrapper:hover {
+        transform: translateY(-10px);
+        background: linear-gradient(45deg, var(--accent-dark), var(--gold), var(--accent-dark));
+    }
+
+	.card {
+		background: rgba(10, 10, 15, 0.8);
+		padding: 2.5rem 1.5rem;
+		border-radius: 15px;
+		text-align: center;
+        backdrop-filter: blur(10px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        box-sizing: border-box;
+	}
+    
+    /* Corner decorations */
+    .card::before, .card::after {
+        content: '✦';
+        position: absolute;
+        color: var(--gold-dark);
+        font-size: 1.2rem;
+        opacity: 0.5;
+    }
+    .card::before { top: 10px; left: 10px; }
+    .card::after { bottom: 10px; right: 10px; }
+
+    .icon-wrapper {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 1px solid var(--gold-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+    }
+    .icon {
+        font-size: 2.5rem;
+    }
+	h3 {
+		margin: 0 0 1rem 0;
+		font-size: 1.4rem;
+        color: var(--gold-light);
+        letter-spacing: 1px;
+	}
+    .divider {
+        width: 50px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
+        margin-bottom: 1.5rem;
+    }
+	p {
+		margin-bottom: 2rem;
+        line-height: 1.6;
+        flex-grow: 1;
+        font-size: 1.1rem;
+        color: #ccc;
+	}
+    button {
+        background: transparent;
+        border: 1px solid var(--gold-dark);
+        color: var(--gold);
+        padding: 0.6rem 2rem;
+        border-radius: 0;
+        cursor: pointer;
+        font-family: 'Cinzel', serif;
+        font-size: 0.9rem;
+        letter-spacing: 2px;
+        transition: all 0.4s ease;
+        margin-top: auto;
+        position: relative;
+        overflow: hidden;
+    }
+    button:hover {
+        background: var(--gold-dark);
+        color: #000;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+    }
+</style>

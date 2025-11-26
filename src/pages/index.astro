@@ -1,16 +1,630 @@
 ---
-
+import Layout from '../layouts/Layout.astro';
+import ServiceCard from '../components/ServiceCard.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Barbara Toffano - Astrologia e Magia">
+	<header>
+        <nav class="container">
+            <div class="logo-container">
+                <img src="/logo.jpeg" alt="Barbara Toffano Logo" class="logo-img" />
+                <div class="logo-text">Barbara Toffano</div>
+            </div>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#servizi">Servizi</a></li>
+                <li><a href="#chi-sono">Chi Sono</a></li>
+                <li><a href="#contatti">Contatti</a></li>
+            </ul>
+        </nav>
+    </header>
+
+	<main>
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <div class="moon-glow"></div>
+                <h1 class="fade-in">Scopri il tuo <span class="gold-text">Destino</span></h1>
+                <p class="subtitle script-font fade-in-delay">Astrologia, Tarocchi e Rituali Magici</p>
+                <div class="separator">✦</div>
+                <a href="#servizi" class="cta-button fade-in-delay-2">Inizia il Viaggio</a>
+            </div>
+        </section>
+
+        <div class="mystic-divider"></div>
+
+        <section id="servizi" class="services">
+            <div class="container">
+                <h2>I Miei Servizi</h2>
+                <p class="section-subtitle script-font">Strumenti antichi per tempi moderni</p>
+                <div class="grid">
+                    <ServiceCard 
+                        title="Lettura Tarocchi" 
+                        description="Scopri cosa le carte hanno in serbo per te. Una lettura approfondita per rispondere alle tue domande più intime."
+                        icon="🎴"
+                    />
+                    <ServiceCard 
+                        title="Oroscopo Natale" 
+                        description="Analisi completa del tuo tema natale. Comprendi i tuoi punti di forza, le sfide e il tuo vero potenziale."
+                        icon="✨"
+                    />
+                    <ServiceCard 
+                        title="Rituali Energetici" 
+                        description="Purificazione dell'aura e rituali per attrarre amore, prosperità e benessere nella tua vita."
+                        icon="🕯️"
+                    />
+                    <ServiceCard 
+                        title="Compatibilità di Coppia" 
+                        description="Analisi sinastrica per capire le dinamiche della tua relazione e migliorare l'armonia."
+                        icon="❤️"
+                    />
+                </div>
+            </div>
+        </section>
+
+        <div class="mystic-divider-reverse"></div>
+
+        <section id="chi-sono" class="about">
+            <div class="container">
+                <h2>Chi Sono</h2>
+                <div class="about-content">
+                    <div class="text">
+                        <p class="intro script-font">Ciao sono Barbara,</p>
+                        <p>La mia curiosità abbinata al mio dono mi hanno portato a studiare nuovi percorsi di vita....</p>
+                        <p>All'inizio tante paure...difficoltà...dubbi....dolore.....poi la Rinascita.....ed eccomi per condividere con voi questo meraviglioso viaggio......</p>
+                        <div class="social-links">
+                            <a href="https://www.youtube.com/@Barbara_toffano" target="_blank" class="youtube-btn">
+                                <span class="btn-icon">▶</span> Visita il mio canale YouTube
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Placeholder for image -->
+                    <div class="image-wrapper">
+                        <div class="magic-circle"></div>
+                        <div class="image-placeholder">🔮</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="mystic-divider"></div>
+
+        <section id="contatti" class="contact">
+            <div class="container">
+                <h2>Contattami</h2>
+                <div class="contact-card">
+                    <div class="contact-info-box">
+                        <p class="phone-label">Chiama o scrivi su WhatsApp</p>
+                        <a href="https://wa.me/393297813392" target="_blank" class="whatsapp-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" class="whatsapp-icon"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91c0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23c-1.48 0-2.93-.39-4.19-1.15l-.3-.17l-3.12.82l.83-3.04l-.2-.32a8.188 8.188 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24M8.53 7.33c-.19-.43-.43-.43-.63-.43h-.53c-.2 0-.53.07-.81.38c-.28.32-1.07 1.05-1.07 2.57s1.09 2.99 1.24 3.2c.15.22 2.16 3.3 5.23 4.63c.75.32 1.33.51 1.79.66c.76.24 1.62.21 2.31.12c.77-.09 1.9-.78 2.16-1.53c.26-.75.26-1.4.19-1.53c-.07-.13-.26-.21-.55-.35c-.29-.15-1.71-.85-1.97-.94c-.26-.1-.45-.15-.64.14c-.19.29-.74.94-.9 1.13c-.17.19-.34.22-.63.07c-.29-.15-1.22-.45-2.32-1.43c-.85-.76-1.43-1.7-1.6-1.99c-.17-.29-.02-.44.13-.58c.13-.13.29-.34.43-.51c.15-.17.19-.29.29-.49c.1-.19.05-.36-.02-.51c-.07-.15-.64-1.54-.88-2.11Z"/></svg>
+                            <span>329 7813392</span>
+                        </a>
+                        <p class="info-text script-font">...per informazioni..</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+	</main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">Barbara Toffano</div>
+                <p>&copy; 2025 Barbara Toffano. Tutti i diritti riservati.</p>
+                <p class="credits">Sito realizzato da <a href="https://bitora.it" target="_blank">Bitora.it</a></p>
+            </div>
+        </div>
+    </footer>
+</Layout>
+
+<style>
+    /* Header */
+    header {
+        padding: 1.5rem 0;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 100;
+        background: rgba(10, 10, 15, 0.8);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+    nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .logo-img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 2px solid var(--gold);
+        object-fit: cover;
+    }
+    .logo-text {
+        font-family: 'Cinzel', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gold);
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+    }
+    nav ul {
+        display: flex;
+        gap: 2.5rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    nav a {
+        color: var(--text-color);
+        text-decoration: none;
+        font-family: 'Cinzel', serif;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        transition: color 0.3s;
+        position: relative;
+    }
+    nav a::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 1px;
+        bottom: -5px;
+        left: 0;
+        background-color: var(--gold);
+        transition: width 0.3s;
+    }
+    nav a:hover {
+        color: var(--gold);
+    }
+    nav a:hover::after {
+        width: 100%;
+    }
+
+    /* Hero */
+    .hero {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .moon-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(157, 78, 221, 0.15) 0%, transparent 70%);
+        z-index: -1;
+        filter: blur(50px);
+    }
+    .hero h1 {
+        font-size: 5rem;
+        margin-bottom: 0.5rem;
+        font-weight: 400;
+        text-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    .gold-text {
+        color: var(--gold);
+        text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    }
+    .subtitle {
+        font-size: 2.5rem;
+        color: var(--accent-light);
+        margin-bottom: 1rem;
+        font-weight: 300;
+    }
+    .separator {
+        font-size: 2rem;
+        color: var(--gold);
+        margin: 1rem 0 2rem;
+        opacity: 0.8;
+    }
+    .cta-button {
+        display: inline-block;
+        background: transparent;
+        color: var(--gold);
+        padding: 1rem 3rem;
+        border: 1px solid var(--gold);
+        text-decoration: none;
+        font-family: 'Cinzel', serif;
+        letter-spacing: 2px;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    .cta-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 100%;
+        background: var(--gold);
+        z-index: -1;
+        transition: width 0.3s;
+    }
+    .cta-button:hover {
+        color: #000;
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+    }
+    .cta-button:hover::before {
+        width: 100%;
+    }
+
+    /* Animations */
+    .fade-in { animation: fadeIn 1.5s ease-out forwards; opacity: 0; }
+    .fade-in-delay { animation: fadeIn 1.5s ease-out 0.5s forwards; opacity: 0; }
+    .fade-in-delay-2 { animation: fadeIn 1.5s ease-out 1s forwards; opacity: 0; }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Dividers */
+    .mystic-divider, .mystic-divider-reverse {
+        height: 100px;
+        width: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z' opacity='.25' fill='%239d4edd'/%3E%3Cpath d='M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z' opacity='.5' fill='%239d4edd'/%3E%3Cpath d='M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z' fill='%239d4edd'/%3E%3C/svg%3E");
+        background-size: cover;
+        background-repeat: no-repeat;
+        opacity: 0.1;
+    }
+    .mystic-divider-reverse {
+        transform: rotate(180deg);
+    }
+
+    /* Sections General */
+    section {
+        padding: 6rem 0;
+        position: relative;
+    }
+    h2 {
+        text-align: center;
+        font-size: 3.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--gold);
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+    }
+    .section-subtitle {
+        text-align: center;
+        font-size: 2rem;
+        color: var(--accent-light);
+        margin-bottom: 4rem;
+        opacity: 0.8;
+    }
+
+    /* Services */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2.5rem;
+    }
+
+    /* About */
+    .about-content {
+        display: flex;
+        align-items: center;
+        gap: 5rem;
+        background: linear-gradient(to right, rgba(255,255,255,0.02), rgba(255,255,255,0.05));
+        padding: 4rem;
+        border-radius: 2px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        position: relative;
+    }
+    .about-content::before {
+        content: '';
+        position: absolute;
+        top: 10px; left: 10px; right: 10px; bottom: 10px;
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        pointer-events: none;
+    }
+    .intro {
+        font-size: 2.5rem;
+        color: var(--gold);
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+    }
+    .text p {
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+        color: #d1d1d1;
+    }
+    .youtube-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        background: #cc0000;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-family: 'Cinzel', serif;
+        letter-spacing: 1px;
+        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .youtube-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(204, 0, 0, 0.4);
+        background: #e60000;
+    }
+    .image-wrapper {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .magic-circle {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 2px dashed var(--gold);
+        border-radius: 50%;
+        animation: rotate 20s linear infinite;
+        opacity: 0.3;
+    }
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .image-placeholder {
+        font-size: 8rem;
+        animation: float 6s ease-in-out infinite;
+        filter: drop-shadow(0 0 30px rgba(157, 78, 221, 0.4));
+        z-index: 2;
+    }
+
+    /* Contact */
+    .contact-card {
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(10, 10, 15, 0.6);
+        padding: 3rem;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        position: relative;
+    }
+    .contact-card::after {
+        content: '✦';
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: var(--gold);
+        font-size: 1.5rem;
+    }
+    .contact-info-box {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+        border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    }
+    .phone-label {
+        font-family: 'Cinzel', serif;
+        color: var(--accent-light);
+        font-size: 1rem;
+        letter-spacing: 2px;
+        margin-bottom: 1rem;
+    }
+    .whatsapp-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        font-size: 2.5rem;
+        font-family: 'Cinzel', serif;
+        color: var(--gold);
+        text-decoration: none;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        margin: 0;
+        line-height: 1;
+        transition: all 0.3s;
+        padding: 1rem 2rem;
+        border: 1px solid var(--gold);
+        background: rgba(10, 10, 15, 0.8);
+        position: relative;
+        overflow: hidden;
+        border-radius: 50px;
+    }
+    .whatsapp-btn:hover {
+        background: var(--gold);
+        color: #000;
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+        transform: translateY(-2px);
+    }
+    .whatsapp-icon {
+        font-size: 1.2em;
+        color: #25D366; /* Keep icon green for recognition */
+        filter: drop-shadow(0 0 5px rgba(37, 211, 102, 0.5));
+    }
+    .whatsapp-btn:hover .whatsapp-icon {
+        color: #000; /* Turn black on hover */
+        filter: none;
+    }
+    .info-text {
+        font-size: 1.8rem;
+        color: var(--text-color);
+        opacity: 0.7;
+        margin-top: 1rem;
+    }
+    .form-intro {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1.2rem;
+    }
+    .contact-form {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+    .input-group {
+        position: relative;
+    }
+    input, textarea {
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+        padding: 1rem 0;
+        color: var(--gold-light);
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.2rem;
+        transition: border-color 0.3s;
+        resize: vertical;
+    }
+    input:focus, textarea:focus {
+        outline: none;
+        border-bottom-color: var(--gold);
+    }
+    label {
+        position: absolute;
+        top: 1rem;
+        left: 0;
+        color: rgba(255,255,255,0.5);
+        pointer-events: none;
+        transition: all 0.3s;
+        font-family: 'Cinzel', serif;
+        font-size: 0.9rem;
+    }
+    input:focus ~ label, input:valid ~ label,
+    textarea:focus ~ label, textarea:valid ~ label {
+        top: -20px;
+        font-size: 0.8rem;
+        color: var(--gold);
+    }
+    button[type="submit"] {
+        background: transparent;
+        color: var(--gold);
+        padding: 1rem;
+        border: 1px solid var(--gold);
+        cursor: pointer;
+        font-family: 'Cinzel', serif;
+        font-size: 1.1rem;
+        letter-spacing: 2px;
+        transition: all 0.3s;
+        margin-top: 1rem;
+        align-self: center;
+        width: 100%;
+        max-width: 300px;
+    }
+    button[type="submit"]:hover {
+        background: var(--gold);
+        color: #000;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+
+    /* Footer */
+    footer {
+        text-align: center;
+        padding: 4rem 0;
+        background: #050505;
+        margin-top: 4rem;
+        border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .footer-logo {
+        font-family: 'Cinzel', serif;
+        font-size: 1.5rem;
+        color: var(--gold);
+        margin-bottom: 1rem;
+    }
+    .credits {
+        margin-top: 1rem;
+        font-size: 0.8rem;
+        opacity: 0.6;
+    }
+    .credits a {
+        color: var(--gold);
+        text-decoration: none;
+    }
+    .credits a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .hero h1 { 
+            font-size: 3rem; 
+            line-height: 1.1;
+        }
+        .subtitle { 
+            font-size: 1.8rem; 
+            padding: 0 1rem;
+        }
+        
+        /* Navigation Mobile */
+        header {
+            padding: 1rem 0;
+        }
+        nav { 
+            flex-direction: column; 
+            gap: 1rem; 
+        }
+        nav ul { 
+            display: flex; 
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        nav a {
+            font-size: 0.8rem;
+        }
+
+        /* About Section Mobile */
+        .about-content { 
+            flex-direction: column; 
+            text-align: center; 
+            padding: 2rem 1.5rem; 
+            gap: 3rem;
+        }
+        .image-wrapper {
+            width: 250px;
+            height: 250px;
+        }
+        .image-placeholder {
+            font-size: 6rem;
+        }
+        
+        /* Contact Mobile */
+        .contact-card {
+            padding: 1.5rem;
+            margin: 0 1rem;
+        }
+        .phone-number { 
+            font-size: 2rem; 
+        }
+        .whatsapp-btn {
+            font-size: 1.2rem;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.8rem 1rem;
+            white-space: nowrap;
+            flex-direction: row;
+            border-radius: 50px;
+        }
+        
+        /* General Mobile */
+        section { 
+            padding: 4rem 0; 
+        }
+        h2 { 
+            font-size: 2.5rem; 
+        }
+        .container {
+            padding: 0 1.5rem;
+        }
+    }
+</style>
