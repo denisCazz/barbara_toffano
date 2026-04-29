@@ -24,6 +24,6 @@ COPY --from=deps /app/node_modules ./node_modules
 EXPOSE 3000
 
 HEALTHCHECK --interval=15s --timeout=10s --start-period=60s --retries=5 \
-  CMD wget -qO- http://localhost:3000/api/health || exit 1
+  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"
 
 CMD node -e "require('fs').existsSync('./dist/server/entry.mjs') || (console.error('Build missing: dist/server/entry.mjs not found') || process.exit(1))" && node ./dist/server/entry.mjs
