@@ -1,143 +1,386 @@
----
+﻿---
 interface Props {
-	title: string;
+  title: string;
 }
-
 const { title } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="it">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content="Servizi astrologici e magici" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
-	</head>
-	<body>
-        <div class="background-overlay"></div>
-        <div class="fog-container">
-            <div class="fog-img fog-img-first"></div>
-            <div class="fog-img fog-img-second"></div>
-        </div>
-		<slot />
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Astrologia, Tarocchi e Rituali Magici con Barbara Toffano" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="bg-overlay" aria-hidden="true"></div>
+    <div class="fog-container" aria-hidden="true">
+      <div class="fog fog-1"></div>
+      <div class="fog fog-2"></div>
+    </div>
+    <slot />
+    <script>
+      // Mobile nav toggle
+      const toggle = document.querySelector<HTMLButtonElement>('.nav-toggle');
+      const menu = document.querySelector<HTMLElement>('.nav-menu');
+      const overlay = document.querySelector<HTMLElement>('.nav-overlay');
+
+      function openMenu() {
+        menu?.classList.add('open');
+        overlay?.classList.add('visible');
+        toggle?.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeMenu() {
+        menu?.classList.remove('open');
+        overlay?.classList.remove('visible');
+        toggle?.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      toggle?.addEventListener('click', () =>
+        menu?.classList.contains('open') ? closeMenu() : openMenu(),
+      );
+      overlay?.addEventListener('click', closeMenu);
+      document.querySelectorAll('.nav-menu a').forEach((l) => l.addEventListener('click', closeMenu));
+
+      // Header scroll shadow
+      const header = document.querySelector('header');
+      function onScroll() {
+        header?.classList.toggle('scrolled', window.scrollY > 24);
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      // Scroll reveal
+      const revealObserver = new IntersectionObserver(
+        (entries) => entries.forEach(e => {
+          if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); }
+        }),
+        { threshold: 0.1 }
+      );
+      document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    </script>
+  </body>
 </html>
 <style is:global>
-	:root {
-		--accent: #9d4edd;
-		--accent-light: #e0aaff;
-		--accent-dark: #240046;
-		--background: #0a0a0f;
-        --text-color: #e2e2e2;
-        --gold: #d4af37;
-        --gold-light: #f4e4bc;
-        --gold-dark: #aa8c2c;
-	}
-	html {
-		font-family: 'Cormorant Garamond', serif;
-		background: var(--background);
-        min-height: 100vh;
-        color: var(--text-color);
-        scroll-behavior: smooth;
-        font-size: 18px;
-	}
-    h1, h2, h3, h4, h5, h6 {
-        font-family: 'Cinzel', serif;
-        color: var(--gold);
-        text-transform: uppercase;
-        letter-spacing: 2px;
-    }
-    .script-font {
-        font-family: 'Great Vibes', cursive;
-        color: var(--accent-light);
-    }
-    body {
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-        position: relative;
-        min-height: 100vh;
-        background: radial-gradient(circle at 50% 0%, #1a0b2e 0%, #000000 100%);
-    }
-    
-    .background-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: -1;
-        background-image: 
-            radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
-            radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
-            radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
-        background-size: 550px 550px, 350px 350px, 250px 250px;
-        background-position: 0 0, 40px 60px, 130px 270px;
-        opacity: 0.8;
-    }
+  :root {
+    --bg: #fdf7ec;
+    --bg-2: #f6edd8;
+    --bg-3: #ede0c4;
+    --card-bg: #fffcf5;
+    --text: #2b1d0e;
+    --text-muted: #7a6248;
+    --gold: #b8852a;
+    --gold-light: #d4a040;
+    --gold-mid: #9a6e1e;
+    --gold-dark: #5c420e;
+    --accent: #c05030;
+    --accent-light: #d9826a;
+    --accent-dark: #7a3018;
+    --accent-mid: #a04030;
+    --sage: #7a9068;
+    --glass: rgba(255,255,255,0.75);
+    --glass-border: rgba(184,133,42,0.16);
+    --gold-glass: rgba(184,133,42,0.08);
+    --gold-border: rgba(184,133,42,0.28);
+  }
 
-    /* Fog Animation */
-    .fog-container {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        z-index: -1;
-        overflow: hidden;
-        pointer-events: none;
-    }
-    .fog-img {
-        position: absolute;
-        height: 100vh;
-        width: 300vw;
-        z-index: 1;
-        opacity: 0.3;
-        background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/img/fog1.png') repeat-x;
-        background-size: contain;
-        animation: fog 60s linear infinite;
-    }
-    .fog-img-second {
-        background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/img/fog2.png') repeat-x;
-        background-size: contain;
-        animation: fog 40s linear infinite;
-        z-index: 2;
-        top: 30%;
-    }
+  *, *::before, *::after { box-sizing: border-box; }
 
-    @keyframes fog {
-        0% { transform: translate3d(0, 0, 0); }
-        100% { transform: translate3d(-200vw, 0, 0); }
-    }
+  html {
+    font-family: 'Lora', Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    scroll-behavior: smooth;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar {
-        width: 8px;
+  body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 80% 40% at 50% -8%, rgba(192,80,48,0.1) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 35% at 88% 92%, rgba(184,133,42,0.1) 0%, transparent 60%),
+      var(--bg);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    letter-spacing: 2px;
+    line-height: 1.2;
+  }
+
+  .script-font {
+    font-family: 'Great Vibes', cursive;
+    color: var(--accent);
+  }
+
+  /* ── Background texture dots ── */
+  .bg-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      radial-gradient(1.5px 1.5px at 12% 18%, rgba(184,133,42,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 33% 63%, rgba(184,133,42,0.14) 0%, transparent 100%),
+      radial-gradient(2px 2px at 52% 14%, rgba(192,80,48,0.16) 0%, transparent 100%),
+      radial-gradient(1px 1px at 68% 44%, rgba(184,133,42,0.12) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 83% 79%, rgba(192,80,48,0.14) 0%, transparent 100%),
+      radial-gradient(1px 1px at 22% 88%, rgba(184,133,42,0.12) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 73% 8%, rgba(192,80,48,0.16) 0%, transparent 100%),
+      radial-gradient(1px 1px at 4% 32%, rgba(184,133,42,0.12) 0%, transparent 100%),
+      radial-gradient(1px 1px at 91% 22%, rgba(192,80,48,0.1) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 46% 55%, rgba(184,133,42,0.13) 0%, transparent 100%),
+      radial-gradient(1px 1px at 62% 82%, rgba(192,80,48,0.1) 0%, transparent 100%),
+      radial-gradient(1px 1px at 28% 45%, rgba(184,133,42,0.1) 0%, transparent 100%);
+    background-size: 680px 460px;
+    opacity: 0.5;
+  }
+
+  /* ── Warm veil (replaces fog) ── */
+  .fog-container { display: none; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg-2); }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--gold-dark), var(--accent-dark));
+    border-radius: 3px;
+  }
+  ::selection { background: var(--gold); color: #fff; }
+
+  /* ── Layout ── */
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  /* ── Navigation ── */
+  header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(253,248,240,0.92);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--gold-border);
+    transform: translateZ(0);
+    transition: box-shadow 0.35s ease;
+  }
+  header.scrolled {
+    box-shadow: 0 2px 28px rgba(44,31,20,0.13);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.25rem;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    text-decoration: none;
+    z-index: 1001;
+    position: relative;
+  }
+  .logo-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid var(--gold);
+    object-fit: cover;
+    box-shadow: 0 0 12px rgba(138,101,32,0.18);
+  }
+  .logo-text {
+    font-family: 'Cinzel', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+
+  /* Desktop nav links */
+  .nav-menu ul {
+    display: flex;
+    gap: 1.8rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+  }
+  .nav-menu a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: color 0.25s;
+    position: relative;
+    padding-bottom: 3px;
+  }
+  .nav-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 1px;
+    background: var(--gold);
+    transition: width 0.3s ease;
+  }
+  .nav-menu a:hover { color: var(--gold); }
+  .nav-menu a:hover::after { width: 100%; }
+
+  .nav-menu a.shop-link {
+    color: var(--gold);
+    border: 1px solid var(--gold-border);
+    padding: 0.35rem 1rem;
+    border-radius: 2rem;
+    transition: all 0.25s;
+  }
+  .nav-menu a.shop-link::after { display: none; }
+  .nav-menu a.shop-link:hover {
+    background: var(--gold);
+    color: #fff;
+    border-color: var(--gold);
+  }
+
+  /* Hamburger */
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    z-index: 1001;
+    position: relative;
+  }
+  .nav-toggle span {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: var(--gold);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+  }
+  .nav-toggle.active span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .nav-toggle.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .nav-toggle.active span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* Overlay */
+  .nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(44,31,20,0.45);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .nav-overlay.visible { opacity: 1; }
+
+  /* Mobile nav */
+  @media (max-width: 768px) {
+    .nav-toggle { display: flex; }
+    .nav-overlay { display: block; }
+    .nav-menu {
+      position: fixed;
+      top: 0; right: -100%;
+      width: min(290px, 80vw);
+      height: 100vh;
+      background: rgba(253,248,240,0.98);
+      backdrop-filter: blur(24px);
+      border-left: 1px solid var(--gold-border);
+      padding: 5.5rem 1.75rem 2rem;
+      z-index: 1000;
+      transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
     }
-    ::-webkit-scrollbar-track {
-        background: #050505; 
+    .nav-menu.open { right: 0; }
+    .nav-menu ul {
+      flex-direction: column;
+      gap: 0;
+      align-items: flex-start;
     }
-    ::-webkit-scrollbar-thumb {
-        background: linear-gradient(to bottom, var(--accent-dark), var(--gold-dark)); 
-        border-radius: 4px;
+    .nav-menu li {
+      width: 100%;
+      border-bottom: 1px solid rgba(138,101,32,0.12);
     }
-    
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 2rem;
+    .nav-menu a {
+      display: block;
+      padding: 1rem 0;
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+      color: var(--text);
     }
-    
-    /* Selection */
-    ::selection {
-        background: var(--gold);
-        color: black;
+    .nav-menu a:hover { color: var(--gold); }
+    .nav-menu a.shop-link {
+      margin-top: 1rem;
+      display: inline-block;
+      padding: 0.65rem 1.4rem;
+      width: auto;
     }
+  }
+
+  /* ── Footer ── */
+  footer {
+    background: #2c1f14;
+    border-top: 1px solid rgba(138,101,32,0.3);
+    padding: 2.5rem 0;
+    position: relative;
+    z-index: 10;
+  }
+  .footer-content {
+    text-align: center;
+    color: rgba(253,248,240,0.55);
+    font-size: 0.88rem;
+  }
+  .footer-logo {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    color: var(--gold-light);
+    margin-bottom: 0.6rem;
+    letter-spacing: 3px;
+  }
+  .footer-content p { margin: 0.25rem 0; }
+  .footer-content a { color: var(--accent-light); text-decoration: none; }
+  .footer-content a:hover { color: var(--gold-light); }
+
+  /* ── Common section styles ── */
+  section { position: relative; z-index: 1; }
+  .gold-text { color: var(--gold); }
+  .accent-text { color: var(--accent); }
+
+  /* ── Scroll Reveal ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.75s ease, transform 0.75s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 </style>

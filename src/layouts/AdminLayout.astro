@@ -1,0 +1,274 @@
+---
+interface Props {
+  title: string;
+  backHref?: string;
+  backLabel?: string;
+}
+const { title, backHref, backLabel } = Astro.props;
+---
+
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title} | Admin — Barbara Toffano</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <nav class="admin-nav">
+      <div class="nav-brand">
+        <span class="brand-star">✦</span>
+        <span class="brand-name">Admin Panel</span>
+      </div>
+      <div class="nav-actions">
+        <a href="/admin/dashboard" class="nav-link">Ordini</a>
+        <form action="/api/admin/logout" method="POST" style="display:inline">
+          <button type="submit" class="logout-btn">Esci</button>
+        </form>
+      </div>
+    </nav>
+
+    <main class="admin-main">
+      {
+        backHref && (
+          <div class="back-bar">
+            <a href={backHref} class="back-link">← {backLabel || 'Indietro'}</a>
+          </div>
+        )
+      }
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --a-bg: #0e0e18;
+    --a-surface: #161622;
+    --a-surface-2: #1e1e2e;
+    --a-border: rgba(255,255,255,0.09);
+    --a-text: #e0e0f0;
+    --a-muted: #7070a0;
+    --a-accent: #9d4edd;
+    --a-gold: #d4af37;
+    --a-gold-dim: rgba(212,175,55,0.15);
+    --a-green: #22c55e;
+    --a-orange: #f97316;
+    --a-blue: #60a5fa;
+    --a-red: #ef4444;
+    --a-radius: 10px;
+    --a-radius-sm: 6px;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--a-bg);
+    color: var(--a-text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Cinzel', serif;
+    color: var(--a-gold);
+    letter-spacing: 1px;
+    margin-top: 0;
+  }
+
+  /* Nav */
+  .admin-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.25rem;
+    height: 56px;
+    background: rgba(14,14,24,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--a-border);
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .brand-star { color: var(--a-gold); font-size: 1rem; }
+  .brand-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: var(--a-gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .nav-link {
+    color: var(--a-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+  .nav-link:hover { color: var(--a-text); }
+  .logout-btn {
+    background: none;
+    border: 1px solid var(--a-border);
+    color: var(--a-muted);
+    padding: 0.35rem 0.9rem;
+    border-radius: var(--a-radius-sm);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  .logout-btn:hover { border-color: var(--a-red); color: var(--a-red); }
+
+  .admin-main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 4rem;
+  }
+
+  .back-bar { margin-bottom: 1.5rem; }
+  .back-link {
+    color: var(--a-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .back-link:hover { color: var(--a-gold); }
+
+  /* Cards */
+  .a-card {
+    background: var(--a-surface);
+    border: 1px solid var(--a-border);
+    border-radius: var(--a-radius);
+    padding: 1.25rem;
+  }
+
+  /* Status badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .badge-attesa   { background: rgba(249,115,22,0.15); color: var(--a-orange); border: 1px solid rgba(249,115,22,0.3); }
+  .badge-lavorazione { background: rgba(96,165,250,0.15); color: var(--a-blue); border: 1px solid rgba(96,165,250,0.3); }
+  .badge-completato  { background: rgba(34,197,94,0.15); color: var(--a-green); border: 1px solid rgba(34,197,94,0.3); }
+  .badge-annullato   { background: rgba(239,68,68,0.15); color: var(--a-red); border: 1px solid rgba(239,68,68,0.3); }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--a-radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--a-accent);
+    color: white;
+  }
+  .btn-primary:hover { background: #7c3aed; }
+  .btn-gold {
+    background: var(--a-gold);
+    color: #000;
+    font-weight: 600;
+  }
+  .btn-gold:hover { background: var(--a-gold-dim); color: var(--a-gold); border: 1px solid var(--a-gold); }
+  .btn-outline {
+    background: transparent;
+    color: var(--a-muted);
+    border: 1px solid var(--a-border);
+  }
+  .btn-outline:hover { border-color: var(--a-text); color: var(--a-text); }
+  .btn-danger {
+    background: rgba(239,68,68,0.15);
+    color: var(--a-red);
+    border: 1px solid rgba(239,68,68,0.3);
+  }
+  .btn-danger:hover { background: rgba(239,68,68,0.25); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-full { width: 100%; }
+  .btn-lg { padding: 0.85rem 1.75rem; font-size: 1rem; }
+
+  /* Form inputs */
+  .a-input, .a-textarea, .a-select {
+    width: 100%;
+    background: var(--a-surface-2);
+    border: 1px solid var(--a-border);
+    border-radius: var(--a-radius-sm);
+    color: var(--a-text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.65rem 0.9rem;
+    transition: border-color 0.2s;
+    appearance: auto;
+  }
+  .a-input:focus, .a-textarea:focus, .a-select:focus {
+    outline: none;
+    border-color: var(--a-accent);
+  }
+  .a-textarea { resize: vertical; min-height: 90px; }
+  .a-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--a-muted);
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .form-group { margin-bottom: 1.25rem; }
+
+  /* Alert */
+  .a-alert {
+    padding: 0.85rem 1rem;
+    border-radius: var(--a-radius-sm);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+  .a-alert-success { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: var(--a-green); }
+  .a-alert-error   { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.3);  color: var(--a-red);   }
+  .a-alert-info    { background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.3); color: var(--a-blue);  }
+
+  /* Grid helpers */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--a-bg); }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+</style>

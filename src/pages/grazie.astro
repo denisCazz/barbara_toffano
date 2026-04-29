@@ -1,0 +1,111 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+
+const orderNumber = Astro.url.searchParams.get('order') ?? '';
+---
+
+<Layout title="Ordine Ricevuto - Barbara Toffano">
+  <main class="grazie-page">
+    <div class="container">
+      <div class="card">
+        <div class="icon">✦</div>
+        <h1>Ordine Ricevuto!</h1>
+        <p class="script-font">Grazie per la tua fiducia</p>
+        {orderNumber && <p class="order-num">Numero ordine: <strong>{orderNumber}</strong></p>}
+        <p class="message">
+          Ho ricevuto la tua richiesta con grande gioia. Riceverai a breve una email di conferma. Ti contatterò per le istruzioni di pagamento e ti aggiornerò non appena il tuo materiale sarà pronto.
+        </p>
+        <a href="https://wa.me/393297813392" class="wa-btn">
+          Scrivi su WhatsApp
+        </a>
+        <a href="/" class="home-link">← Torna alla Home</a>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .grazie-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 1.25rem 3rem;
+    position: relative;
+    z-index: 1;
+  }
+  .container { max-width: 520px; margin: 0 auto; width: 100%; }
+  .card {
+    background: var(--card-bg, #fffcf5);
+    border: 1px solid rgba(184,133,42,0.22);
+    border-radius: 24px;
+    padding: 3.5rem 2.5rem;
+    text-align: center;
+    box-shadow: 0 8px 48px rgba(184,133,42,0.1);
+  }
+  .icon {
+    font-size: 2rem;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    letter-spacing: 8px;
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 0.7; }
+    50%      { opacity: 1; }
+  }
+  h1 {
+    font-size: 1.8rem;
+    margin: 0 0 0.25rem;
+    color: var(--gold);
+  }
+  .script-font { font-size: 1.8rem; margin: 0 0 1.75rem; color: var(--accent); opacity: 0.85; }
+  .order-num {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    background: rgba(184,133,42,0.07);
+    border: 1px solid rgba(184,133,42,0.18);
+    padding: 0.55rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+  }
+  .order-num strong { color: var(--gold); }
+  .message {
+    color: var(--text-muted);
+    line-height: 1.8;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+  .wa-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #25D366;
+    color: white;
+    padding: 0.9rem 2.2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+    margin-bottom: 1.5rem;
+    transition: background 0.3s, transform 0.3s;
+    box-shadow: 0 4px 18px rgba(37,211,102,0.3);
+  }
+  .wa-btn:hover { background: #1ebe57; transform: translateY(-2px); }
+  .home-link {
+    display: block;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    opacity: 0.7;
+  }
+  .home-link:hover { color: var(--gold); opacity: 1; }
+</style>

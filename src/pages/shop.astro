@@ -1,0 +1,202 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+import ShopCard from '../components/ShopCard.astro';
+import { products } from '../data/products';
+---
+
+<Layout title="Shop Mistico - Barbara Toffano">
+  <header>
+    <div class="nav-inner">
+      <a href="/" class="logo-container">
+        <img src="/logo.jpeg" alt="Barbara Toffano" class="logo-img" />
+        <span class="logo-text">Barbara Toffano</span>
+      </a>
+      <button class="nav-toggle" aria-label="Apri menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-overlay"></div>
+      <nav class="nav-menu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/#servizi">Servizi</a></li>
+          <li><a href="/shop" class="shop-link active">✦ Shop</a></li>
+          <li><a href="/#chi-sono">Chi Sono</a></li>
+          <li><a href="/#contatti">Contatti</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="shop-page">
+    <div class="shop-hero">
+      <h1>Lo Shop Mistico</h1>
+      <p class="script-font">Scegli il percorso di trasformazione per la tua anima</p>
+    </div>
+
+    <div class="container">
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">Tutti</button>
+        <button class="filter-btn" data-filter="audio">🎵 Audio Personalizzati</button>
+        <button class="filter-btn" data-filter="carta">🎴 Letture Carte</button>
+        <button class="filter-btn" data-filter="pacchetto">🌟 Pacchetti</button>
+      </div>
+
+      <div class="products-grid">
+        {
+          products.map((p) => (
+            <div class="product-wrapper" data-type={p.type}>
+              <ShopCard product={p} />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="shop-note">
+      <div class="container">
+        <div class="note-card">
+          <span class="note-icon">💫</span>
+          <div>
+            <h3>Come funziona?</h3>
+            <p>Scegli il prodotto, compila i tuoi dati e inviami l'ordine. Riceverai una conferma via email. Per gli audio personali, Barbara li registrerà appositamente per te e ti invierà il link per scaricarli.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">Barbara Toffano</div>
+        <p>&copy; {new Date().getFullYear()} Barbara Toffano. Tutti i diritti riservati.</p>
+        <p class="credits">Sito realizzato da <a href="https://bitora.it" target="_blank" rel="noopener">Bitora.it</a></p>
+      </div>
+    </div>
+  </footer>
+</Layout>
+
+<script>
+  // Filter buttons
+  const filterBtns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const wrappers = document.querySelectorAll<HTMLElement>('.product-wrapper');
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      wrappers.forEach((w) => {
+        w.style.display = filter === 'all' || w.dataset.type === filter ? '' : 'none';
+      });
+    });
+  });
+</script>
+
+<style>
+  .shop-page {
+    padding-top: 80px;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  .shop-hero {
+    text-align: center;
+    padding: 4.5rem 1.25rem 2.5rem;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(192,80,48,0.08) 0%, transparent 70%);
+    border-bottom: 1px solid rgba(184,133,42,0.12);
+    margin-bottom: 0.5rem;
+  }
+  .shop-hero h1 {
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    margin-bottom: 0.5rem;
+  }
+  .shop-hero p {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    opacity: 0.85;
+    color: var(--accent);
+  }
+
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  /* Filters */
+  .filters {
+    display: flex;
+    gap: 0.75rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 0.55rem 1.2rem;
+    background: transparent;
+    border: 1px solid rgba(184,133,42,0.24);
+    color: var(--text-muted);
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { border-color: rgba(184,133,42,0.5); color: var(--gold); }
+  .filter-btn.active {
+    background: rgba(184,133,42,0.12);
+    border-color: rgba(184,133,42,0.55);
+    color: var(--gold-mid);
+    font-weight: 600;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding-bottom: 3rem;
+  }
+
+  /* Note section */
+  .shop-note {
+    background: rgba(181,113,62,0.04);
+    border-top: 1px solid rgba(138,101,32,0.1);
+    padding: 3rem 0;
+  }
+  .note-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    background: var(--card-bg, #fffcf5);
+    border: 1px solid rgba(184,133,42,0.18);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 720px;
+    margin: 0 auto;
+    box-shadow: 0 4px 24px rgba(184,133,42,0.07);
+  }
+  .note-icon { font-size: 2.5rem; flex-shrink: 0; }
+  .note-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    letter-spacing: 1.5px;
+    color: var(--gold);
+  }
+  .note-card p {
+    color: var(--text-muted);
+    line-height: 1.7;
+    font-size: 1rem;
+    margin: 0;
+  }
+  .note-card a { color: var(--gold); text-decoration: none; }
+  .note-card a:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    .note-card { flex-direction: column; gap: 1rem; }
+    .filters { gap: 0.5rem; }
+    .filter-btn { font-size: 0.65rem; padding: 0.5rem 0.9rem; }
+  }
+</style>

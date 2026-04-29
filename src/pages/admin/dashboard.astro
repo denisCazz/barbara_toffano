@@ -1,0 +1,289 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getDb } from '../../lib/db';
+
+export const prerender = false;
+
+const db = getDb();
+
+const statusFilter = Astro.url.searchParams.get('status') || 'all';
+
+const validStatuses = ['in_attesa', 'lavorazione', 'completato', 'annullato'];
+const whereClause =
+  statusFilter !== 'all' && validStatuses.includes(statusFilter)
+    ? `WHERE status = '${statusFilter}'`
+    : '';
+
+const [ordersRows] = await db.execute(
+  `SELECT id, order_number, customer_name, customer_email, product_name, product_type,
+          amount, status, created_at
+   FROM orders ${whereClause}
+   ORDER BY created_at DESC
+   LIMIT 100`,
+);
+const orders = ordersRows as any[];
+
+const [countRows] = await db.execute(
+  `SELECT status, COUNT(*) as cnt FROM orders GROUP BY status`,
+);
+const counts = Object.fromEntries(
+  (countRows as any[]).map((r: any) => [r.status, Number(r.cnt)]),
+);
+const totalCount = Object.values(counts).reduce((a: any, b: any) => a + b, 0);
+
+function formatDate(d: string) {
+  return new Date(d).toLocaleDateString('it-IT', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+function badgeClass(status: string) {
+  const map: Record<string, string> = {
+    in_attesa: 'badge-attesa',
+    lavorazione: 'badge-lavorazione',
+    completato: 'badge-completato',
+    annullato: 'badge-annullato',
+  };
+  return map[status] || '';
+}
+function statusLabel(status: string) {
+  const map: Record<string, string> = {
+    in_attesa: 'In Attesa',
+    lavorazione: 'In Lavorazione',
+    completato: 'Completato',
+    annullato: 'Annullato',
+  };
+  return map[status] || status;
+}
+---
+
+<AdminLayout title="Dashboard">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <a href="/admin/dashboard" class="refresh-btn">↺ Aggiorna</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-value">{totalCount}</span>
+      <span class="stat-label">Totale Ordini</span>
+    </div>
+    <div class="stat-card stat-attesa">
+      <span class="stat-value">{counts['in_attesa'] || 0}</span>
+      <span class="stat-label">In Attesa</span>
+    </div>
+    <div class="stat-card stat-lavorazione">
+      <span class="stat-value">{counts['lavorazione'] || 0}</span>
+      <span class="stat-label">In Lavorazione</span>
+    </div>
+    <div class="stat-card stat-completato">
+      <span class="stat-value">{counts['completato'] || 0}</span>
+      <span class="stat-label">Completati</span>
+    </div>
+  </div>
+
+  <!-- Status Tabs -->
+  <div class="tabs" role="tablist">
+    {
+      [
+        { key: 'all', label: 'Tutti' },
+        { key: 'in_attesa', label: 'In Attesa' },
+        { key: 'lavorazione', label: 'Lavorazione' },
+        { key: 'completato', label: 'Completati' },
+        { key: 'annullato', label: 'Annullati' },
+      ].map((tab) => (
+        <a
+          href={`/admin/dashboard?status=${tab.key}`}
+          class={`tab ${statusFilter === tab.key ? 'active' : ''}`}
+          role="tab"
+        >
+          {tab.label}
+          {tab.key !== 'all' && counts[tab.key] ? (
+            <span class="tab-count">{counts[tab.key]}</span>
+          ) : null}
+        </a>
+      ))
+    }
+  </div>
+
+  <!-- Orders List -->
+  {
+    orders.length === 0 ? (
+      <div class="empty-state">
+        <span class="empty-icon">✦</span>
+        <p>Nessun ordine trovato</p>
+      </div>
+    ) : (
+      <div class="orders-list">
+        {orders.map((order) => (
+          <a href={`/admin/ordine/${order.id}`} class="order-card">
+            <div class="order-top">
+              <span class="order-number">{order.order_number}</span>
+              <span class={`badge ${badgeClass(order.status)}`}>
+                {statusLabel(order.status)}
+              </span>
+            </div>
+            <div class="order-customer">{order.customer_name}</div>
+            <div class="order-product">
+              <span class="type-icon">
+                {order.product_type === 'audio' ? '🎵' : order.product_type === 'carta' ? '🎴' : '🌟'}
+              </span>
+              {order.product_name}
+            </div>
+            <div class="order-footer">
+              <span class="order-email">{order.customer_email}</span>
+              <div class="order-right">
+                <span class="order-amount">€{Number(order.amount).toFixed(2)}</span>
+                <span class="order-date">{formatDate(order.created_at)}</span>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    )
+  }
+</AdminLayout>
+
+<style>
+  .dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .dashboard-header h1 { font-size: 1.4rem; margin: 0; }
+  .refresh-btn {
+    color: var(--a-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+  .refresh-btn:hover { color: var(--a-gold); }
+
+  /* Stats */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.875rem;
+    margin-bottom: 1.75rem;
+  }
+  .stat-card {
+    background: var(--a-surface);
+    border: 1px solid var(--a-border);
+    border-radius: var(--a-radius);
+    padding: 1rem;
+    text-align: center;
+  }
+  .stat-value {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 1.75rem;
+    color: var(--a-gold);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+  .stat-label { font-size: 0.72rem; color: var(--a-muted); letter-spacing: 0.5px; text-transform: uppercase; }
+  .stat-attesa .stat-value { color: var(--a-orange); }
+  .stat-lavorazione .stat-value { color: var(--a-blue); }
+  .stat-completato .stat-value { color: var(--a-green); }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 1.25rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    color: var(--a-muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    border-radius: var(--a-radius-sm);
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab:hover { color: var(--a-text); background: var(--a-surface-2); }
+  .tab.active { background: var(--a-surface-2); border-color: var(--a-border); color: var(--a-gold); }
+  .tab-count {
+    font-size: 0.7rem;
+    background: rgba(255,255,255,0.1);
+    padding: 0.1rem 0.4rem;
+    border-radius: 1rem;
+  }
+
+  /* Orders */
+  .orders-list { display: flex; flex-direction: column; gap: 0.6rem; }
+  .order-card {
+    background: var(--a-surface);
+    border: 1px solid var(--a-border);
+    border-radius: var(--a-radius);
+    padding: 1rem 1.1rem;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .order-card:hover { border-color: rgba(212,175,55,0.3); background: var(--a-surface-2); }
+  .order-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+  }
+  .order-number {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    color: var(--a-gold);
+    letter-spacing: 1px;
+  }
+  .order-customer {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--a-text);
+    margin-bottom: 0.25rem;
+  }
+  .order-product {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--a-muted);
+    margin-bottom: 0.6rem;
+  }
+  .type-icon { font-size: 0.9rem; }
+  .order-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .order-email { font-size: 0.8rem; color: var(--a-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .order-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+  .order-amount { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--a-gold); }
+  .order-date { font-size: 0.75rem; color: var(--a-muted); }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: var(--a-muted);
+  }
+  .empty-icon { font-size: 2rem; display: block; margin-bottom: 0.75rem; color: var(--a-gold); opacity: 0.4; }
+
+  @media (max-width: 600px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .order-footer { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+    .order-right { flex-direction: row; }
+  }
+  @media (max-width: 360px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>

@@ -1,0 +1,597 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getDb } from '../../../lib/db';
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const db = getDb();
+
+if (!id) return new Response('Not found', { status: 404 });
+
+const [rows] = await db.execute('SELECT * FROM orders WHERE id = ?', [id as string]);
+const order = (rows as any[])[0];
+
+if (!order) {
+  return new Response('Ordine non trovato', { status: 404 });
+}
+
+function statusLabel(s: string) {
+  return { in_attesa: 'In Attesa', lavorazione: 'In Lavorazione', completato: 'Completato', annullato: 'Annullato' }[s] || s;
+}
+function badgeClass(s: string) {
+  return { in_attesa: 'badge-attesa', lavorazione: 'badge-lavorazione', completato: 'badge-completato', annullato: 'badge-annullato' }[s] || '';
+}
+function formatDate(d: string) {
+  return new Date(d).toLocaleString('it-IT', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+const isAudioOrder = order.product_type === 'audio' || order.product_type === 'pacchetto';
+---
+
+<AdminLayout title={`Ordine ${order.order_number}`} backHref="/admin/dashboard" backLabel="Dashboard">
+  <!-- Header -->
+  <div class="order-header">
+    <div class="order-id-row">
+      <h1>{order.order_number}</h1>
+      <span class={`badge ${badgeClass(order.status)}`}>{statusLabel(order.status)}</span>
+    </div>
+    <p class="order-date">Ricevuto il {formatDate(order.created_at)}</p>
+  </div>
+
+  <div class="order-grid">
+    <!-- Left Column -->
+    <div class="left-col">
+      <!-- Customer Info -->
+      <div class="a-card section-card">
+        <h3>👤 Cliente</h3>
+        <div class="info-row">
+          <span class="info-label">Nome</span>
+          <span class="info-value">{order.customer_name}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <a href={`mailto:${order.customer_email}`} class="info-link">{order.customer_email}</a>
+        </div>
+        {order.customer_phone && (
+          <div class="info-row">
+            <span class="info-label">Telefono</span>
+            <a href={`https://wa.me/${order.customer_phone.replace(/\D/g, '')}`} target="_blank" class="info-link">{order.customer_phone}</a>
+          </div>
+        )}
+        {order.customer_notes && (
+          <div class="info-row notes-row">
+            <span class="info-label">Note cliente</span>
+            <p class="customer-notes">{order.customer_notes}</p>
+          </div>
+        )}
+      </div>
+
+      <!-- Product Info -->
+      <div class="a-card section-card">
+        <h3>{order.product_type === 'audio' ? '🎵' : order.product_type === 'carta' ? '🎴' : '🌟'} Prodotto</h3>
+        <div class="info-row">
+          <span class="info-label">Prodotto</span>
+          <span class="info-value">{order.product_name}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Tipo</span>
+          <span class="info-value type-cap">{order.product_type}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Importo</span>
+          <span class="info-value amount">€{Number(order.amount).toFixed(2)}</span>
+        </div>
+      </div>
+
+      <!-- Status Update -->
+      <div class="a-card section-card">
+        <h3>📋 Stato Ordine</h3>
+        <form id="status-form" action="/api/admin/update-order" method="POST">
+          <input type="hidden" name="order_id" value={order.id} />
+          <div class="form-group">
+            <label class="a-label">Cambia Stato</label>
+            <select name="status" class="a-select">
+              <option value="in_attesa" selected={order.status === 'in_attesa'}>In Attesa</option>
+              <option value="lavorazione" selected={order.status === 'lavorazione'}>In Lavorazione</option>
+              <option value="completato" selected={order.status === 'completato'}>Completato</option>
+              <option value="annullato" selected={order.status === 'annullato'}>Annullato</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="a-label">Note Interne</label>
+            <textarea name="admin_notes" class="a-textarea" placeholder="Note visibili solo a te...">{order.admin_notes || ''}</textarea>
+          </div>
+          <button type="submit" class="btn btn-outline">Salva Modifiche</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right Column: Audio Section -->
+    <div class="right-col">
+      {isAudioOrder ? (
+        <div class="a-card section-card audio-section">
+          <h3>🎵 Audio Personalizzato</h3>
+
+          <!-- Existing Audio -->
+          {order.audio_file_path && (
+            <div class="existing-audio a-alert a-alert-success" id="existing-audio">
+              <div>
+                <strong>Audio già caricato:</strong> {order.audio_original_name || 'registrazione.webm'}
+              </div>
+            </div>
+          )}
+
+          <!-- Tabs -->
+          <div class="audio-tabs">
+            <button class="audio-tab active" data-tab="upload">📁 Carica File</button>
+            <button class="audio-tab" data-tab="record">🎙 Registra</button>
+          </div>
+
+          <!-- Upload Tab -->
+          <div class="tab-content" id="tab-upload">
+            <div class="dropzone" id="dropzone">
+              <input type="file" id="file-input" accept="audio/*" class="file-input-hidden" />
+              <div class="drop-inner">
+                <span class="drop-icon">🎵</span>
+                <p class="drop-text">Trascina il file audio qui</p>
+                <p class="drop-sub">oppure</p>
+                <button type="button" class="btn btn-outline" id="browse-btn">Scegli File</button>
+                <p class="file-name" id="file-name-display" style="display:none"></p>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-full" id="upload-file-btn" disabled>
+              Carica File
+            </button>
+          </div>
+
+          <!-- Record Tab -->
+          <div class="tab-content hidden" id="tab-record">
+            <!-- Pre-recording state -->
+            <div id="pre-record">
+              <p class="rec-hint">Premi il pulsante per iniziare a registrare l'audio direttamente dal tuo dispositivo.</p>
+              <button class="btn btn-rec btn-full" id="start-rec-btn">
+                <span class="rec-dot"></span> Inizia Registrazione
+              </button>
+            </div>
+
+            <!-- Recording state -->
+            <div id="recording-state" style="display:none">
+              <div class="rec-status">
+                <span class="rec-dot pulsing"></span>
+                <span class="rec-label">REC</span>
+                <span class="rec-timer" id="rec-timer">00:00</span>
+              </div>
+              <div class="waveform" id="waveform">
+                {Array.from({length: 16}).map(() => <div class="waveform-bar"></div>)}
+              </div>
+              <button class="btn btn-danger btn-full" id="stop-rec-btn">⏹ Stop Registrazione</button>
+            </div>
+
+            <!-- Post-recording state -->
+            <div id="post-record" style="display:none">
+              <div class="a-alert a-alert-info">Registrazione completata. Ascolta prima di inviare.</div>
+              <audio id="rec-preview" controls class="audio-player"></audio>
+              <div class="rec-actions">
+                <button class="btn btn-outline" id="discard-btn">🗑 Scarta</button>
+                <button class="btn btn-primary" id="upload-rec-btn">⬆ Carica Registrazione</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upload Progress -->
+          <div id="upload-progress" style="display:none">
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+            <p class="progress-text">Caricamento in corso...</p>
+          </div>
+
+          <!-- Send Section -->
+          <div id="send-section" class={order.audio_file_path ? '' : 'hidden'}>
+            <div class="send-divider">
+              <span>oppure</span>
+            </div>
+            <div class="send-info">
+              <p>Audio pronto? Invia il link di download al cliente via email.</p>
+            </div>
+            <button class="btn btn-gold btn-full btn-lg" id="send-audio-btn">
+              ✉ Invia Audio al Cliente
+            </button>
+            {order.download_token && (
+              <p class="already-sent">✓ Email di download già inviata in precedenza</p>
+            )}
+          </div>
+
+          <!-- Feedback messages -->
+          <div id="audio-feedback" style="display:none" class="a-alert"></div>
+        </div>
+      ) : (
+        <div class="a-card section-card">
+          <h3>📄 Questo ordine non prevede audio</h3>
+          <p class="no-audio-msg">Il prodotto ordinato è una lettura/report. Consegna il materiale via email direttamente.</p>
+          <a href={`mailto:${order.customer_email}`} class="btn btn-primary">
+            ✉ Invia Email al Cliente
+          </a>
+        </div>
+      )}
+    </div>
+  </div>
+</AdminLayout>
+
+<script define:vars={{ orderId: order.id, hasAudio: !!order.audio_file_path }}>
+  // ── Tab switching ──
+  const tabBtns = document.querySelectorAll('.audio-tab');
+  const tabContents = document.querySelectorAll('.tab-content');
+  tabBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      tabBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      tabContents.forEach((c) => {
+        c.classList.toggle('hidden', c.id !== `tab-${tab}`);
+      });
+    });
+  });
+
+  // ── File Upload ──
+  const fileInput = document.getElementById('file-input');
+  const dropzone  = document.getElementById('dropzone');
+  const browseBtn = document.getElementById('browse-btn');
+  const fileNameDisplay = document.getElementById('file-name-display');
+  const uploadFileBtn = document.getElementById('upload-file-btn');
+
+  browseBtn?.addEventListener('click', () => fileInput?.click());
+
+  fileInput?.addEventListener('change', () => {
+    const file = fileInput.files?.[0];
+    if (file) {
+      fileNameDisplay.textContent = file.name;
+      fileNameDisplay.style.display = 'block';
+      uploadFileBtn.disabled = false;
+    }
+  });
+
+  dropzone?.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+  dropzone?.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+  dropzone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('drag-over');
+    const file = e.dataTransfer?.files[0];
+    if (file && file.type.startsWith('audio/')) {
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      fileInput.files = dt.files;
+      fileNameDisplay.textContent = file.name;
+      fileNameDisplay.style.display = 'block';
+      uploadFileBtn.disabled = false;
+    }
+  });
+
+  uploadFileBtn?.addEventListener('click', async () => {
+    const file = fileInput?.files?.[0];
+    if (!file) return;
+    await uploadAudio(file);
+  });
+
+  // ── Recording ──
+  let mediaRecorder = null;
+  let chunks = [];
+  let timerInterval = null;
+  let seconds = 0;
+  let recordedBlob = null;
+
+  const startBtn   = document.getElementById('start-rec-btn');
+  const stopBtn    = document.getElementById('stop-rec-btn');
+  const preRecord  = document.getElementById('pre-record');
+  const recState   = document.getElementById('recording-state');
+  const postRecord = document.getElementById('post-record');
+  const timerEl    = document.getElementById('rec-timer');
+  const preview    = document.getElementById('rec-preview');
+  const discardBtn = document.getElementById('discard-btn');
+  const uploadRecBtn = document.getElementById('upload-rec-btn');
+
+  startBtn?.addEventListener('click', async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      chunks = [];
+      mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+      mediaRecorder.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        recordedBlob = new Blob(chunks, { type: 'audio/webm' });
+        preview.src = URL.createObjectURL(recordedBlob);
+        recState.style.display = 'none';
+        postRecord.style.display = 'block';
+      };
+      mediaRecorder.start(250);
+      seconds = 0;
+      timerInterval = setInterval(() => {
+        seconds++;
+        const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const s = String(seconds % 60).padStart(2, '0');
+        if (timerEl) timerEl.textContent = `${m}:${s}`;
+      }, 1000);
+      preRecord.style.display = 'none';
+      recState.style.display = 'block';
+    } catch {
+      showFeedback('Impossibile accedere al microfono. Controlla i permessi.', 'error');
+    }
+  });
+
+  stopBtn?.addEventListener('click', () => {
+    clearInterval(timerInterval);
+    mediaRecorder?.stop();
+  });
+
+  discardBtn?.addEventListener('click', () => {
+    recordedBlob = null;
+    preview.src = '';
+    postRecord.style.display = 'none';
+    preRecord.style.display = 'block';
+    seconds = 0;
+    if (timerEl) timerEl.textContent = '00:00';
+  });
+
+  uploadRecBtn?.addEventListener('click', async () => {
+    if (!recordedBlob) return;
+    await uploadAudio(recordedBlob, 'registrazione.webm');
+  });
+
+  // ── Upload Helper ──
+  async function uploadAudio(fileOrBlob, filename) {
+    const progress = document.getElementById('upload-progress');
+    const fill = document.getElementById('progress-fill');
+    progress.style.display = 'block';
+
+    let pct = 0;
+    const interval = setInterval(() => {
+      pct = Math.min(pct + 10, 85);
+      if (fill) fill.style.width = `${pct}%`;
+    }, 200);
+
+    const formData = new FormData();
+    formData.append('order_id', String(orderId));
+    formData.append('action', 'upload');
+    formData.append('audio', fileOrBlob, filename ?? fileOrBlob.name ?? 'audio.webm');
+
+    try {
+      const res = await fetch('/api/admin/upload-audio', { method: 'POST', body: formData });
+      clearInterval(interval);
+      if (fill) fill.style.width = '100%';
+      if (res.ok) {
+        showFeedback('Audio caricato con successo! Ora puoi inviarlo al cliente.', 'success');
+        document.getElementById('send-section')?.classList.remove('hidden');
+        // Refresh existing audio display
+        const existingAudio = document.getElementById('existing-audio');
+        if (!existingAudio) {
+          const alertDiv = document.createElement('div');
+          alertDiv.className = 'existing-audio a-alert a-alert-success';
+          alertDiv.innerHTML = '<div><strong>Audio caricato.</strong></div>';
+          document.getElementById('tab-upload')?.prepend(alertDiv);
+        }
+      } else {
+        const data = await res.json().catch(() => ({}));
+        showFeedback(data.error || 'Errore durante il caricamento.', 'error');
+      }
+    } catch {
+      clearInterval(interval);
+      showFeedback('Errore di rete. Riprova.', 'error');
+    } finally {
+      setTimeout(() => { progress.style.display = 'none'; if (fill) fill.style.width = '0'; }, 1500);
+    }
+  }
+
+  // ── Send Audio ──
+  const sendBtn = document.getElementById('send-audio-btn');
+  sendBtn?.addEventListener('click', async () => {
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Invio in corso...';
+    try {
+      const formData = new FormData();
+      formData.append('order_id', String(orderId));
+      formData.append('action', 'send');
+      const res = await fetch('/api/admin/upload-audio', { method: 'POST', body: formData });
+      if (res.ok) {
+        showFeedback('✓ Email inviata al cliente con successo!', 'success');
+        sendBtn.textContent = '✓ Inviato';
+      } else {
+        const data = await res.json().catch(() => ({}));
+        showFeedback(data.error || 'Errore durante l\'invio.', 'error');
+        sendBtn.disabled = false;
+        sendBtn.textContent = '✉ Invia Audio al Cliente';
+      }
+    } catch {
+      showFeedback('Errore di rete.', 'error');
+      sendBtn.disabled = false;
+      sendBtn.textContent = '✉ Invia Audio al Cliente';
+    }
+  });
+
+  function showFeedback(msg, type) {
+    const el = document.getElementById('audio-feedback');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = `a-alert a-alert-${type}`;
+    el.style.display = 'block';
+    if (type === 'success') setTimeout(() => { el.style.display = 'none'; }, 6000);
+  }
+</script>
+
+<style>
+  .order-header { margin-bottom: 1.5rem; }
+  .order-id-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .order-id-row h1 { font-size: 1.3rem; margin: 0; }
+  .order-date { color: var(--a-muted); font-size: 0.82rem; margin: 0.3rem 0 0; }
+
+  .order-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  .section-card { margin-bottom: 1.1rem; }
+  .section-card h3 {
+    font-size: 0.9rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 1rem;
+    color: var(--a-muted);
+    text-transform: uppercase;
+  }
+
+  .info-row {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--a-border);
+    align-items: flex-start;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { font-size: 0.78rem; color: var(--a-muted); min-width: 80px; flex-shrink: 0; padding-top: 1px; }
+  .info-value { font-size: 0.9rem; color: var(--a-text); }
+  .info-link { color: var(--a-blue); font-size: 0.9rem; text-decoration: none; }
+  .info-link:hover { text-decoration: underline; }
+  .amount { font-family: 'Cinzel', serif; color: var(--a-gold); font-size: 1rem; }
+  .type-cap { text-transform: capitalize; }
+  .customer-notes { color: var(--a-muted); font-size: 0.88rem; margin: 0; line-height: 1.5; }
+  .notes-row { flex-direction: column; gap: 0.3rem; }
+
+  /* Audio section */
+  .audio-section h3 { color: var(--a-text); }
+  .existing-audio { margin-bottom: 1rem; }
+
+  .audio-tabs {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--a-border);
+    padding-bottom: 0;
+  }
+  .audio-tab {
+    padding: 0.55rem 1rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--a-muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    margin-bottom: -1px;
+  }
+  .audio-tab.active { color: var(--a-gold); border-bottom-color: var(--a-gold); }
+  .audio-tab:hover { color: var(--a-text); }
+
+  .hidden { display: none !important; }
+
+  /* Dropzone */
+  .dropzone {
+    border: 1.5px dashed var(--a-border);
+    border-radius: var(--a-radius);
+    padding: 2rem 1rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+  }
+  .dropzone.drag-over { border-color: var(--a-accent); background: rgba(157,78,221,0.07); }
+  .drop-icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+  .drop-text { color: var(--a-text); font-size: 0.9rem; margin: 0 0 0.25rem; }
+  .drop-sub { color: var(--a-muted); font-size: 0.8rem; margin: 0 0 0.75rem; }
+  .file-input-hidden { display: none; }
+  .file-name { color: var(--a-green); font-size: 0.82rem; margin: 0.5rem 0 0; }
+
+  /* Record */
+  .rec-hint { color: var(--a-muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1rem; }
+  .btn-rec { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; }
+  .btn-rec:hover { background: rgba(239,68,68,0.22); }
+  .rec-dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    background: #ef4444;
+    border-radius: 50%;
+    margin-right: 0.3rem;
+  }
+  .rec-dot.pulsing { animation: blink 1s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{ opacity:1; } 50%{ opacity:0.2; } }
+
+  .rec-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .rec-label { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 2px; color: #ef4444; }
+  .rec-timer { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--a-text); margin-left: auto; }
+
+  .waveform {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 40px;
+    margin-bottom: 1rem;
+    justify-content: center;
+  }
+  .waveform-bar {
+    width: 4px;
+    background: var(--a-accent);
+    border-radius: 2px;
+    animation: wave 0.8s ease-in-out infinite;
+    height: 8px;
+  }
+  .waveform-bar:nth-child(odd) { animation-delay: 0.15s; }
+  .waveform-bar:nth-child(3n) { animation-delay: 0.3s; }
+  .waveform-bar:nth-child(4n) { animation-delay: 0.45s; }
+  @keyframes wave {
+    0%,100% { height: 6px; }
+    50%      { height: 32px; }
+  }
+
+  .audio-player { width: 100%; margin: 0.75rem 0; }
+  .rec-actions { display: flex; gap: 0.75rem; }
+  .rec-actions .btn { flex: 1; }
+
+  /* Progress */
+  .progress-bar {
+    height: 4px;
+    background: var(--a-border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--a-accent), var(--a-gold));
+    border-radius: 2px;
+    transition: width 0.2s ease;
+    width: 0;
+  }
+  .progress-text { font-size: 0.8rem; color: var(--a-muted); text-align: center; }
+
+  /* Send section */
+  .send-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.5rem 0 1rem;
+  }
+  .send-divider::before, .send-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--a-border);
+  }
+  .send-divider span { font-size: 0.75rem; color: var(--a-muted); }
+  .send-info p { color: var(--a-muted); font-size: 0.88rem; margin-bottom: 0.75rem; }
+  .already-sent { color: var(--a-green); font-size: 0.8rem; text-align: center; margin-top: 0.5rem; }
+
+  .no-audio-msg { color: var(--a-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem; }
+
+  @media (max-width: 640px) {
+    .order-grid { grid-template-columns: 1fr; }
+    .rec-actions { flex-direction: column; }
+  }
+</style>

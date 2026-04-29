@@ -1,0 +1,744 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+import { products, getProductById } from '../data/products';
+
+const productIdParam = Astro.url.searchParams.get('product');
+const selectedProductId = productIdParam ? Number(productIdParam) : null;
+const selectedProduct = selectedProductId ? getProductById(selectedProductId) : null;
+
+const typeLabelMap: Record<string, string> = {
+  audio: 'Audio Personale',
+  carta: 'Lettura Carte',
+  pacchetto: 'Pacchetto',
+};
+
+if (Astro.request.method === 'POST') {
+  return Astro.redirect('/api/checkout', 307);
+}
+---
+
+<Layout title="Acquisto - Barbara Toffano">
+  <header>
+    <div class="nav-inner">
+      <a href="/" class="logo-container">
+        <img src="/logo.jpeg" alt="Barbara Toffano" class="logo-img" />
+        <span class="logo-text">Barbara Toffano</span>
+      </a>
+      <button class="nav-toggle" aria-label="Apri menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-overlay"></div>
+      <nav class="nav-menu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/shop" class="shop-link">✦ Shop</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="checkout-page">
+    <div class="container">
+
+      <!-- Step indicator -->
+      <div class="steps-bar">
+        <div class="step active" id="dot-1">
+          <div class="step-dot">1</div>
+          <span class="step-label">Prodotto</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="dot-2">
+          <div class="step-dot">2</div>
+          <span class="step-label">I tuoi dati</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="dot-3">
+          <div class="step-dot">3</div>
+          <span class="step-label">Pagamento</span>
+        </div>
+      </div>
+
+      <form id="checkout-form" action="/api/checkout" method="POST">
+        <input type="hidden" name="product_id" id="hidden-product-id"
+          value={selectedProduct?.id?.toString() ?? ''} />
+        <input type="hidden" name="payment_method" id="hidden-payment" value="" />
+
+        <!-- ── STEP 1: Prodotto ── -->
+        <div class="step-panel" id="panel-1">
+          <div class="panel-inner">
+            <h2 class="panel-title">Il tuo prodotto</h2>
+
+            {selectedProduct ? (
+              <div class="selected-product">
+                <div class="prod-icon-wrap">{selectedProduct.icon}</div>
+                <div class="prod-info">
+                  <span class="prod-badge">{typeLabelMap[selectedProduct.type]}</span>
+                  <h3>{selectedProduct.name}</h3>
+                  <p class="prod-desc">{selectedProduct.description}</p>
+                  <ul class="prod-details">
+                    {selectedProduct.details.map((d) => <li>◆ {d}</li>)}
+                  </ul>
+                  <div class="prod-price-row">
+                    <span class="prod-price">€{selectedProduct.price.toFixed(2)}</span>
+                    <a href="/shop" class="change-link">Cambia prodotto</a>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div class="product-picker">
+                <p class="picker-intro">Seleziona un prodotto per continuare:</p>
+                {products.map((p) => (
+                  <label class="picker-item" data-price={p.price}>
+                    <input type="radio" name="product_select" value={p.id} class="picker-radio" />
+                    <span class="picker-icon">{p.icon}</span>
+                    <span class="picker-name">{p.name}</span>
+                    <span class="picker-price">€{p.price.toFixed(2)}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+
+            <div class="step-actions">
+              <button type="button" class="btn-next" id="btn-1-2">
+                Continua <span>→</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP 2: Dati personali ── -->
+        <div class="step-panel hidden" id="panel-2">
+          <div class="panel-inner">
+            <h2 class="panel-title">I tuoi dati</h2>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="name">Nome e Cognome <span class="req">*</span></label>
+                <input type="text" id="name" name="name" required placeholder="Es. Maria Rossi" autocomplete="name" />
+              </div>
+              <div class="form-group">
+                <label for="email">Email <span class="req">*</span></label>
+                <input type="email" id="email" name="email" required placeholder="maria@email.it" autocomplete="email" />
+              </div>
+              <div class="form-group">
+                <label for="phone">Telefono / WhatsApp</label>
+                <input type="tel" id="phone" name="phone" placeholder="+39 333 123 4567" autocomplete="tel" />
+              </div>
+              <div class="form-group full">
+                <label for="notes">Domande o note per Barbara</label>
+                <textarea id="notes" name="notes" rows="4"
+                  placeholder="Raccontami brevemente di cosa hai bisogno o cosa vorresti sapere..."></textarea>
+              </div>
+            </div>
+
+            <div class="step-actions two-buttons">
+              <button type="button" class="btn-back" id="btn-2-1">← Indietro</button>
+              <button type="button" class="btn-next" id="btn-2-3">Continua <span>→</span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP 3: Pagamento ── -->
+        <div class="step-panel hidden" id="panel-3">
+          <div class="panel-inner">
+            <h2 class="panel-title">Metodo di pagamento</h2>
+            <p class="panel-subtitle">
+              Scegli come preferisci pagare. Dopo la conferma ti invieremo le istruzioni via email.
+            </p>
+
+            <div class="payment-options">
+              <label class="payment-option" id="opt-paypal">
+                <input type="radio" name="payment_choice" value="paypal" class="payment-radio" />
+                <div class="option-body">
+                  <div class="option-logo">
+                    <svg viewBox="0 0 100 28" width="80" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <text x="0" y="22" font-family="Arial Black, sans-serif" font-weight="900" font-size="24"
+                        fill="#003087">Pay</text>
+                      <text x="40" y="22" font-family="Arial Black, sans-serif" font-weight="900" font-size="24"
+                        fill="#009cde">Pal</text>
+                    </svg>
+                  </div>
+                  <div class="option-info">
+                    <strong>PayPal</strong>
+                    <span>Riceverai via email un link per pagare in modo sicuro tramite PayPal.</span>
+                  </div>
+                </div>
+              </label>
+
+              <label class="payment-option" id="opt-bonifico">
+                <input type="radio" name="payment_choice" value="bonifico" class="payment-radio" />
+                <div class="option-body">
+                  <div class="option-logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="2" y="5" width="20" height="14" rx="2"/>
+                      <line x1="2" y1="10" x2="22" y2="10"/>
+                    </svg>
+                  </div>
+                  <div class="option-info">
+                    <strong>Bonifico Bancario</strong>
+                    <span>Riceverai le coordinate bancarie via email per effettuare il bonifico.</span>
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            <!-- Riepilogo ordine finale -->
+            <div class="order-summary-box" id="order-summary">
+              <p class="summary-label">Riepilogo ordine</p>
+              <div class="summary-row">
+                <span id="summary-product">—</span>
+                <span id="summary-price" class="summary-price">—</span>
+              </div>
+            </div>
+
+            <div class="step-actions two-buttons">
+              <button type="button" class="btn-back" id="btn-3-2">← Indietro</button>
+              <button type="submit" class="btn-submit" id="btn-submit" disabled>
+                Conferma Ordine ✦
+              </button>
+            </div>
+
+            <p class="submit-note">
+              Riceverai una email di conferma. Barbara ti risponderà entro 24 ore.
+            </p>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">Barbara Toffano</div>
+        <p>&copy; {new Date().getFullYear()} Barbara Toffano. Tutti i diritti riservati.</p>
+      </div>
+    </div>
+  </footer>
+</Layout>
+
+<script>
+  const selectedProductId = new URLSearchParams(window.location.search).get('product');
+
+  // ── Product data (for picker summary) ──
+  const productPrices: Record<string, { name: string; price: string }> = {
+    '1': { name: 'Lettura dei Tarocchi Personale', price: '€35.00' },
+    '2': { name: 'Meditazione Guidata Personalizzata', price: '€25.00' },
+    '3': { name: "Affermazioni Sacre dell'Anima", price: '€20.00' },
+    '4': { name: 'Pacchetto Luce Totale', price: '€65.00' },
+    '5': { name: "Messaggi dell'Anima", price: '€30.00' },
+    '6': { name: 'Oroscopo Natale Completo', price: '€45.00' },
+  };
+
+  // ── DOM refs ──
+  const panels = [1, 2, 3].map((n) => document.getElementById(`panel-${n}`)!);
+  const dots   = [1, 2, 3].map((n) => document.getElementById(`dot-${n}`)!);
+  const hiddenProductId  = document.getElementById('hidden-product-id') as HTMLInputElement;
+  const hiddenPayment    = document.getElementById('hidden-payment') as HTMLInputElement;
+  const summaryProduct   = document.getElementById('summary-product')!;
+  const summaryPrice     = document.getElementById('summary-price')!;
+  const btnSubmit        = document.getElementById('btn-submit') as HTMLButtonElement;
+  const pickerRadios     = document.querySelectorAll<HTMLInputElement>('.picker-radio');
+
+  // ── Navigate steps ──
+  function goTo(step: number) {
+    panels.forEach((p, i) => p.classList.toggle('hidden', i !== step - 1));
+    dots.forEach((d, i) => {
+      d.classList.toggle('active', i < step);
+      d.classList.toggle('done', i < step - 1);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── Step 1 → 2 validation ──
+  document.getElementById('btn-1-2')?.addEventListener('click', () => {
+    if (!selectedProductId) {
+      // Picker mode: ensure something is selected
+      const checked = document.querySelector<HTMLInputElement>('.picker-radio:checked');
+      if (!checked) { alert('Seleziona un prodotto per continuare.'); return; }
+      hiddenProductId.value = checked.value;
+    }
+    goTo(2);
+  });
+
+  // Sync picker radio → hidden input
+  pickerRadios.forEach((r) => {
+    r.addEventListener('change', () => { hiddenProductId.value = r.value; });
+  });
+
+  // ── Step 2 → 3 validation ──
+  document.getElementById('btn-2-3')?.addEventListener('click', () => {
+    const name  = (document.getElementById('name')  as HTMLInputElement).value.trim();
+    const email = (document.getElementById('email') as HTMLInputElement).value.trim();
+    if (!name)  { alert('Inserisci il tuo nome e cognome.'); return; }
+    if (!email || !email.includes('@')) { alert('Inserisci un indirizzo email valido.'); return; }
+
+    // Update summary
+    const pid = hiddenProductId.value || selectedProductId || '';
+    const prod = productPrices[pid];
+    summaryProduct.textContent = prod ? prod.name : '—';
+    summaryPrice.textContent   = prod ? prod.price : '—';
+
+    goTo(3);
+  });
+
+  // ── Back buttons ──
+  document.getElementById('btn-2-1')?.addEventListener('click', () => goTo(1));
+  document.getElementById('btn-3-2')?.addEventListener('click', () => goTo(2));
+
+  // ── Payment choice → enable submit ──
+  document.querySelectorAll<HTMLInputElement>('.payment-radio').forEach((r) => {
+    r.addEventListener('change', () => {
+      hiddenPayment.value = r.value;
+      btnSubmit.disabled  = false;
+      document.querySelectorAll('.payment-option').forEach((o) => o.classList.remove('selected'));
+      r.closest('.payment-option')?.classList.add('selected');
+    });
+  });
+</script>
+
+<style>
+  .checkout-page {
+    padding-top: 90px;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+    padding-bottom: 5rem;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  /* ── Step bar ── */
+  .steps-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 2.5rem 0 2rem;
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .step-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-3);
+    border: 2px solid rgba(184,133,42,0.22);
+    color: var(--text-muted);
+    font-family: 'Cinzel', serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+  }
+
+  .step-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+    transition: color 0.3s;
+  }
+
+  .step.active .step-dot {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #fff;
+  }
+  .step.active .step-label { color: var(--gold); }
+
+  .step.done .step-dot {
+    background: var(--gold-mid);
+    border-color: var(--gold-mid);
+    color: #fff;
+  }
+  .step.done .step-dot::after { content: '✓'; font-size: 0.75rem; }
+  .step.done .step-dot { font-size: 0; }
+
+  .step-line {
+    flex: 1;
+    height: 2px;
+    background: rgba(184,133,42,0.2);
+    min-width: 60px;
+    max-width: 100px;
+    margin-bottom: 1.2rem;
+  }
+
+  /* ── Panels ── */
+  .step-panel.hidden { display: none; }
+
+  .panel-inner {
+    background: var(--card-bg, #fffcf5);
+    border: 1px solid rgba(184,133,42,0.2);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 32px rgba(184,133,42,0.08);
+  }
+
+  .panel-title {
+    font-size: 1.3rem;
+    letter-spacing: 2.5px;
+    margin: 0 0 0.4rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(184,133,42,0.15);
+    padding-bottom: 1rem;
+  }
+
+  .panel-subtitle {
+    font-size: 1rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 0 0 2rem;
+  }
+
+  /* ── Product summary ── */
+  .selected-product {
+    display: flex;
+    gap: 1.25rem;
+    padding: 1.25rem 0;
+  }
+
+  .prod-icon-wrap {
+    font-size: 2.5rem;
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #fdf0e0, #f0e2cc);
+    border: 1px solid rgba(184,133,42,0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .prod-info { flex: 1; }
+
+  .prod-badge {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: rgba(184,133,42,0.1);
+    color: var(--gold-mid);
+    border: 1px solid rgba(184,133,42,0.25);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+  }
+
+  .prod-info h3 {
+    font-size: 1.05rem;
+    color: var(--text);
+    letter-spacing: 0.5px;
+    margin: 0 0 0.5rem;
+    text-align: left;
+  }
+
+  .prod-desc {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 0 0 0.75rem;
+  }
+
+  .prod-details {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .prod-details li {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .prod-price-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .prod-price {
+    font-family: 'Cinzel', serif;
+    font-size: 1.75rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .change-link {
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(122,98,72,0.3);
+    padding-bottom: 2px;
+    transition: color 0.2s;
+  }
+  .change-link:hover { color: var(--gold); }
+
+  /* ── Product picker ── */
+  .picker-intro {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .picker-item {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(184,133,42,0.15);
+    border-radius: 10px;
+    margin-bottom: 0.6rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .picker-item:has(.picker-radio:checked),
+  .picker-item:hover {
+    border-color: rgba(184,133,42,0.4);
+    background: rgba(184,133,42,0.05);
+  }
+  .picker-radio { display: none; }
+  .picker-icon { font-size: 1.4rem; }
+  .picker-name { flex: 1; font-size: 0.95rem; color: var(--text); }
+  .picker-price {
+    font-family: 'Cinzel', serif;
+    color: var(--accent);
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  /* ── Form fields ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .req { color: var(--accent); }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  textarea {
+    width: 100%;
+    background: rgba(253,247,236,0.6);
+    border: 1px solid rgba(184,133,42,0.22);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    color: var(--text);
+    font-family: 'Lora', Georgia, serif;
+    font-size: 1rem;
+    transition: border-color 0.2s, background 0.2s;
+    box-sizing: border-box;
+    outline: none;
+  }
+  input:focus, textarea:focus {
+    border-color: rgba(184,133,42,0.55);
+    background: rgba(255,252,245,0.9);
+    box-shadow: 0 0 0 3px rgba(184,133,42,0.08);
+  }
+  textarea { resize: vertical; min-height: 100px; }
+
+  /* ── Payment options ── */
+  .payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .payment-option {
+    display: block;
+    cursor: pointer;
+  }
+
+  .payment-radio { display: none; }
+
+  .option-body {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem 1.5rem;
+    border: 2px solid rgba(184,133,42,0.18);
+    border-radius: 12px;
+    transition: all 0.25s;
+    background: rgba(253,247,236,0.5);
+  }
+
+  .payment-option:hover .option-body,
+  .payment-option.selected .option-body {
+    border-color: var(--gold);
+    background: rgba(184,133,42,0.06);
+    box-shadow: 0 2px 16px rgba(184,133,42,0.1);
+  }
+
+  .payment-option.selected .option-body {
+    border-color: var(--gold);
+    background: rgba(184,133,42,0.08);
+  }
+
+  .option-logo {
+    width: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--text-muted);
+  }
+
+  .option-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .option-info strong {
+    font-family: 'Cinzel', serif;
+    font-size: 0.88rem;
+    letter-spacing: 1px;
+    color: var(--text);
+  }
+  .option-info span {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* ── Order summary box ── */
+  .order-summary-box {
+    background: rgba(184,133,42,0.06);
+    border: 1px solid rgba(184,133,42,0.2);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+  }
+
+  .summary-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.6rem;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+
+  .summary-price {
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ── Buttons ── */
+  .step-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+  .step-actions.two-buttons { justify-content: space-between; }
+
+  .btn-next, .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 2.2rem;
+    background: var(--gold);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.78rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.25s, transform 0.2s, opacity 0.2s;
+  }
+  .btn-next:hover, .btn-submit:hover:not(:disabled) {
+    background: var(--gold-mid);
+    transform: translateY(-1px);
+  }
+  .btn-submit:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.9rem 1.5rem;
+    background: transparent;
+    border: 1px solid rgba(184,133,42,0.3);
+    color: var(--text-muted);
+    border-radius: 8px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.78rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .btn-back:hover { border-color: var(--gold); color: var(--gold); }
+
+  .submit-note {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 1rem;
+    line-height: 1.5;
+    opacity: 0.8;
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 600px) {
+    .panel-inner { padding: 1.75rem 1.25rem; }
+    .form-grid { grid-template-columns: 1fr; }
+    .selected-product { flex-direction: column; }
+    .prod-icon-wrap { width: 50px; height: 50px; font-size: 1.8rem; align-self: flex-start; }
+    .step-line { min-width: 30px; }
+    .step-label { display: none; }
+  }
+</style>
