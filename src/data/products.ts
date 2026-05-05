@@ -3,7 +3,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  type: 'audio' | 'carta' | 'pacchetto';
+  type: 'consulto' | 'meditazione' | 'lettura' | 'vendita';
   icon: string;
   details: string[];
   featured?: boolean;
@@ -12,72 +12,69 @@ export interface Product {
 export const products: Product[] = [
   {
     id: 1,
-    name: 'Lettura dei Tarocchi Personale',
+    name: 'Consulto Privato',
     description:
-      'Una lettura approfondita e personalizzata delle carte dei Tarocchi, con risposta alle tue domande più intime sul lavoro, amore e percorso di vita.',
+      'Un consulto privato e riservato per fare chiarezza su amore, lavoro e percorso di vita. Un momento dedicato a te, con ascolto profondo e guida intuitiva.',
     price: 35,
-    type: 'carta',
-    icon: '🎴',
-    details: ['Report scritto completo', 'Risposta a 3 domande', 'Consegna entro 48h'],
+    type: 'consulto',
+    icon: '🔮',
+    details: ['Sessione privata', 'Chiarezza su 1–3 temi', 'Riscontro entro 24h'],
     featured: true,
   },
   {
     id: 2,
-    name: 'Meditazione Guidata Personalizzata',
+    name: 'Meditazione con Guarigione Energetica (ThetaHealing)',
     description:
-      'Una meditazione guidata registrata appositamente per te, basata sul tuo tema natale e le tue necessità spirituali del momento.',
+      'Meditazione guidata con guarigione energetica in ThetaHealing per sciogliere blocchi, ritrovare centratura e alleggerire mente e cuore.',
     price: 25,
-    type: 'audio',
-    icon: '🎵',
-    details: ['Audio MP3 personale', 'Durata 20–30 minuti', 'Tema cucito su di te'],
+    type: 'meditazione',
+    icon: '🪷',
+    details: ['Percorso guidato', 'Riequilibrio energetico', 'Rilascio e centratura'],
     featured: true,
   },
   {
     id: 3,
-    name: "Affermazioni Sacre dell'Anima",
+    name: 'Lettura delle Rune',
     description:
-      'Affermazioni potenti registrate con la tua vibrazione specifica, per attrarre abbondanza, amore e guarigione nella tua vita.',
-    price: 20,
-    type: 'audio',
-    icon: '✨',
-    details: ['Audio MP3 personale', '15–20 affermazioni uniche', 'Frequenze sacre'],
+      'Le rune come linguaggio antico: un responso chiaro per comprendere ciò che si muove nel presente e la direzione più armonica per te.',
+    price: 25,
+    type: 'lettura',
+    icon: 'ᚱ',
+    details: ['Lettura completa', 'Messaggio e consiglio', 'Indicazioni pratiche'],
     featured: true,
   },
   {
     id: 4,
-    name: 'Pacchetto Luce Totale',
+    name: 'Lettura delle Carte degli Angeli',
     description:
-      'Il percorso completo: lettura dei tarocchi + meditazione guidata + affermazioni personalizzate. Un viaggio integrale di trasformazione.',
-    price: 65,
-    type: 'pacchetto',
-    icon: '🌟',
-    details: [
-      'Lettura Tarocchi completa',
-      'Meditazione personalizzata',
-      'Affermazioni sacre',
-      'Priorità di consegna',
-    ],
+      'Un messaggio dolce e diretto dalle energie angeliche per portare luce, fiducia e guarigione emotiva nelle tue scelte.',
+    price: 25,
+    type: 'lettura',
+    icon: '👼',
+    details: ['Messaggio angelico', 'Chiarezza emotiva', 'Focus su amore e relazioni'],
     featured: true,
   },
   {
     id: 5,
-    name: "Messaggi dell'Anima",
+    name: 'Lettura degli Oracoli',
     description:
-      "Un audio canale dove Barbara trasmette i messaggi che l'universo ha per te in questo preciso momento della tua vita.",
-    price: 30,
-    type: 'audio',
-    icon: '🔮',
-    details: ['Channeling audio personale', 'Durata 10–15 minuti', 'Messaggi intuitivi'],
+      'Una lettura con oracoli per ricevere risposte e conferme: utile quando senti bisogno di direzione, protezione e significato.',
+    price: 25,
+    type: 'lettura',
+    icon: '🌙',
+    details: ['Responso immediato', 'Consiglio per il momento', 'Energia della settimana'],
+    featured: true,
   },
   {
     id: 6,
-    name: 'Oroscopo Natale Completo',
+    name: 'Vendita delle Carte (con consegna)',
     description:
-      'Analisi approfondita del tuo tema natale: pianeti, case astrologiche e nodi karmici. Include report PDF e audio di commento.',
-    price: 45,
-    type: 'carta',
-    icon: '⭐',
-    details: ['Report PDF completo', 'Audio di commento', 'Pianeti, case e nodi karmici'],
+      'Acquista le carte e ricevi la consegna direttamente a casa. Perfette per iniziare (o approfondire) il tuo percorso di lettura.',
+    price: 20,
+    type: 'vendita',
+    icon: '🎴',
+    details: ['Carte selezionate', 'Consegna inclusa', 'Assistenza per scegliere'],
+    featured: true,
   },
 ];
 

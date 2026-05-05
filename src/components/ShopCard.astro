@@ -7,14 +7,16 @@ interface Props {
 const { product } = Astro.props;
 
 const typeLabelMap: Record<Product['type'], string> = {
-  audio: 'Audio Personale',
-  carta: 'Lettura Carte',
-  pacchetto: 'Pacchetto',
+  consulto: 'Consulto',
+  meditazione: 'Meditazione',
+  lettura: 'Lettura',
+  vendita: 'Vendita',
 };
 const typeColorMap: Record<Product['type'], string> = {
-  audio: 'badge-audio',
-  carta: 'badge-carta',
-  pacchetto: 'badge-pack',
+  consulto: 'badge-consulto',
+  meditazione: 'badge-meditazione',
+  lettura: 'badge-lettura',
+  vendita: 'badge-vendita',
 };
 ---
 
@@ -46,7 +48,7 @@ const typeColorMap: Record<Product['type'], string> = {
 <style>
   .shop-card {
     background: var(--card-bg, #fffcf5);
-    border: 1px solid rgba(184,133,42,0.2);
+    border: 1px solid rgba(185,146,58,0.2);
     border-radius: 16px;
     padding: 1.75rem;
     display: flex;
@@ -57,7 +59,7 @@ const typeColorMap: Record<Product['type'], string> = {
   }
   .shop-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 16px 48px rgba(184,133,42,0.11);
+    box-shadow: 0 16px 48px rgba(185,146,58,0.11);
   }
 
   /* ── Header: icon + meta ── */
@@ -67,7 +69,7 @@ const typeColorMap: Record<Product['type'], string> = {
     gap: 1rem;
     margin-bottom: 1.25rem;
     padding-bottom: 1.25rem;
-    border-bottom: 1px solid rgba(184,133,42,0.13);
+    border-bottom: 1px solid rgba(185,146,58,0.13);
   }
 
   .icon-area {
@@ -75,8 +77,8 @@ const typeColorMap: Record<Product['type'], string> = {
     width: 58px;
     height: 58px;
     border-radius: 14px;
-    background: linear-gradient(135deg, #fdf0e0, #f0e2cc);
-    border: 1px solid rgba(184,133,42,0.22);
+    background: linear-gradient(135deg, rgba(167,139,250,0.18), rgba(185,146,58,0.12));
+    border: 1px solid rgba(185,146,58,0.22);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -103,20 +105,25 @@ const typeColorMap: Record<Product['type'], string> = {
     width: fit-content;
     white-space: nowrap;
   }
-  .badge-audio {
-    background: rgba(192,80,48,0.1);
+  .badge-consulto {
+    background: rgba(124, 58, 237, 0.12);
     color: var(--accent);
-    border: 1px solid rgba(192,80,48,0.26);
+    border: 1px solid rgba(124, 58, 237, 0.30);
   }
-  .badge-carta {
-    background: rgba(184,133,42,0.1);
+  .badge-meditazione {
+    background: rgba(196, 181, 253, 0.18);
+    color: var(--accent-mid);
+    border: 1px solid rgba(196, 181, 253, 0.35);
+  }
+  .badge-lettura {
+    background: rgba(107, 63, 29, 0.12);
     color: var(--gold-mid);
-    border: 1px solid rgba(184,133,42,0.26);
+    border: 1px solid rgba(107, 63, 29, 0.28);
   }
-  .badge-pack {
-    background: rgba(80,130,80,0.1);
-    color: #4a7a40;
-    border: 1px solid rgba(80,130,80,0.22);
+  .badge-vendita {
+    background: rgba(234, 88, 12, 0.12);
+    color: var(--ember);
+    border: 1px solid rgba(234, 88, 12, 0.30);
   }
 
   h3 {
@@ -165,13 +172,13 @@ const typeColorMap: Record<Product['type'], string> = {
     gap: 1rem;
     margin-top: auto;
     padding-top: 1.1rem;
-    border-top: 1px solid rgba(184,133,42,0.14);
+    border-top: 1px solid rgba(185,146,58,0.14);
   }
 
   .price {
     font-family: 'Cinzel', serif;
     font-size: 1.7rem;
-    color: var(--accent);
+    color: var(--ember);
     font-weight: 600;
     letter-spacing: -0.5px;
   }
@@ -181,7 +188,7 @@ const typeColorMap: Record<Product['type'], string> = {
     align-items: center;
     gap: 0.45rem;
     padding: 0.7rem 1.5rem;
-    background: var(--gold);
+    background: var(--accent);
     color: #fff;
     border-radius: 8px;
     text-decoration: none;
@@ -194,7 +201,7 @@ const typeColorMap: Record<Product['type'], string> = {
     flex-shrink: 0;
   }
   .buy-btn:hover {
-    background: var(--gold-mid);
+    background: var(--accent-mid);
     transform: translateY(-1px);
   }
   .arr { transition: transform 0.25s; }

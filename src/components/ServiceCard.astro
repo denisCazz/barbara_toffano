@@ -17,7 +17,7 @@ const { title, description, icon = '✨' } = Astro.props;
 <style>
   .card {
     background: var(--card-bg, #fffcf5);
-    border: 1px solid rgba(184,133,42,0.22);
+    border: 1px solid rgba(185,146,58,0.22);
     border-radius: 16px;
     padding: 2.5rem 2rem 2rem;
     text-align: center;
@@ -43,8 +43,8 @@ const { title, description, icon = '✨' } = Astro.props;
 
   .card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 18px 50px rgba(184,133,42,0.13);
-    border-color: rgba(184,133,42,0.42);
+    box-shadow: 0 18px 50px rgba(185,146,58,0.13);
+    border-color: rgba(185,146,58,0.42);
   }
   .card:hover::after { opacity: 1; }
 
@@ -56,15 +56,15 @@ const { title, description, icon = '✨' } = Astro.props;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #fdf0e0, #f5e4cc);
-    border: 1.5px solid rgba(184,133,42,0.28);
+    background: linear-gradient(135deg, rgba(167,139,250,0.18), rgba(185,146,58,0.12));
+    border: 1.5px solid rgba(185,146,58,0.26);
     margin-bottom: 1.5rem;
     flex-shrink: 0;
     transition: transform 0.3s, border-color 0.3s;
   }
   .card:hover .card-icon {
     transform: scale(1.06);
-    border-color: rgba(184,133,42,0.5);
+    border-color: rgba(185,146,58,0.48);
   }
 
   h3 {
@@ -94,13 +94,13 @@ const { title, description, icon = '✨' } = Astro.props;
     align-items: center;
     gap: 0.4rem;
     padding-bottom: 3px;
-    border-bottom: 1px solid rgba(192,80,48,0.32);
+    border-bottom: 1px solid rgba(109,40,217,0.32);
     transition: color 0.25s, border-color 0.25s;
     margin-top: auto;
   }
   .card-cta:hover {
     color: var(--gold);
-    border-bottom-color: rgba(184,133,42,0.5);
+    border-bottom-color: rgba(185,146,58,0.5);
   }
   .arr { transition: transform 0.25s; }
   .card-cta:hover .arr { transform: translateX(5px); }

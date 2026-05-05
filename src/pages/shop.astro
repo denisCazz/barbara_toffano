@@ -27,7 +27,7 @@ import { products } from '../data/products';
     </div>
   </header>
 
-  <main class="shop-page">
+  <main class="shop-page veil">
     <div class="shop-hero">
       <h1>Lo Shop Mistico</h1>
       <p class="script-font">Scegli il percorso di trasformazione per la tua anima</p>
@@ -36,9 +36,10 @@ import { products } from '../data/products';
     <div class="container">
       <div class="filters">
         <button class="filter-btn active" data-filter="all">Tutti</button>
-        <button class="filter-btn" data-filter="audio">🎵 Audio Personalizzati</button>
-        <button class="filter-btn" data-filter="carta">🎴 Letture Carte</button>
-        <button class="filter-btn" data-filter="pacchetto">🌟 Pacchetti</button>
+        <button class="filter-btn" data-filter="consulto">🔮 Consulti</button>
+        <button class="filter-btn" data-filter="meditazione">🪷 Meditazioni</button>
+        <button class="filter-btn" data-filter="lettura">📜 Letture</button>
+        <button class="filter-btn" data-filter="vendita">🎴 Vendita</button>
       </div>
 
       <div class="products-grid">
@@ -104,8 +105,10 @@ import { products } from '../data/products';
   .shop-hero {
     text-align: center;
     padding: 4.5rem 1.25rem 2.5rem;
-    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(192,80,48,0.08) 0%, transparent 70%);
-    border-bottom: 1px solid rgba(184,133,42,0.12);
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124, 58, 237, 0.22) 0%, transparent 72%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(234, 88, 12, 0.12) 0%, transparent 70%);
+    border-bottom: 1px solid rgba(255, 244, 235, 0.10);
     margin-bottom: 0.5rem;
   }
   .shop-hero h1 {
@@ -134,8 +137,8 @@ import { products } from '../data/products';
   .filter-btn {
     padding: 0.55rem 1.2rem;
     background: transparent;
-    border: 1px solid rgba(184,133,42,0.24);
-    color: var(--text-muted);
+    border: 1px solid rgba(255, 244, 235, 0.18);
+    color: rgba(255, 244, 235, 0.72);
     font-family: 'Cinzel', serif;
     font-size: 0.7rem;
     letter-spacing: 1.5px;
@@ -144,11 +147,11 @@ import { products } from '../data/products';
     transition: all 0.25s;
     white-space: nowrap;
   }
-  .filter-btn:hover { border-color: rgba(184,133,42,0.5); color: var(--gold); }
+  .filter-btn:hover { border-color: rgba(251, 146, 60, 0.55); color: var(--ember-soft); }
   .filter-btn.active {
-    background: rgba(184,133,42,0.12);
-    border-color: rgba(184,133,42,0.55);
-    color: var(--gold-mid);
+    background: rgba(124, 58, 237, 0.16);
+    border-color: rgba(124, 58, 237, 0.45);
+    color: var(--accent-light);
     font-weight: 600;
   }
 
@@ -161,8 +164,8 @@ import { products } from '../data/products';
 
   /* Note section */
   .shop-note {
-    background: rgba(181,113,62,0.04);
-    border-top: 1px solid rgba(138,101,32,0.1);
+    background: rgba(0, 0, 0, 0.35);
+    border-top: 1px solid rgba(255, 244, 235, 0.10);
     padding: 3rem 0;
   }
   .note-card {
@@ -170,13 +173,13 @@ import { products } from '../data/products';
     align-items: flex-start;
     gap: 1.5rem;
     background: var(--card-bg, #fffcf5);
-    border: 1px solid rgba(184,133,42,0.18);
+    border: 1px solid rgba(185,146,58,0.18);
     border-left: 4px solid var(--accent);
     border-radius: 12px;
     padding: 2rem;
     max-width: 720px;
     margin: 0 auto;
-    box-shadow: 0 4px 24px rgba(184,133,42,0.07);
+    box-shadow: 0 4px 24px rgba(185,146,58,0.07);
   }
   .note-icon { font-size: 2.5rem; flex-shrink: 0; }
   .note-card h3 {

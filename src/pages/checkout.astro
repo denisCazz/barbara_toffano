@@ -37,7 +37,7 @@ if (Astro.request.method === 'POST') {
     </div>
   </header>
 
-  <main class="checkout-page">
+  <main class="checkout-page veil">
     <div class="container">
 
       <!-- Step indicator -->
@@ -224,12 +224,12 @@ if (Astro.request.method === 'POST') {
 
   // ── Product data (for picker summary) ──
   const productPrices: Record<string, { name: string; price: string }> = {
-    '1': { name: 'Lettura dei Tarocchi Personale', price: '€35.00' },
-    '2': { name: 'Meditazione Guidata Personalizzata', price: '€25.00' },
-    '3': { name: "Affermazioni Sacre dell'Anima", price: '€20.00' },
-    '4': { name: 'Pacchetto Luce Totale', price: '€65.00' },
-    '5': { name: "Messaggi dell'Anima", price: '€30.00' },
-    '6': { name: 'Oroscopo Natale Completo', price: '€45.00' },
+    '1': { name: 'Consulto Privato', price: '€35.00' },
+    '2': { name: 'Meditazione con Guarigione Energetica (ThetaHealing)', price: '€25.00' },
+    '3': { name: 'Lettura delle Rune', price: '€25.00' },
+    '4': { name: 'Lettura delle Carte degli Angeli', price: '€25.00' },
+    '5': { name: 'Lettura degli Oracoli', price: '€25.00' },
+    '6': { name: 'Vendita delle Carte (con consegna)', price: '€20.00' },
   };
 
   // ── DOM refs ──
@@ -335,7 +335,7 @@ if (Astro.request.method === 'POST') {
     height: 36px;
     border-radius: 50%;
     background: var(--bg-3);
-    border: 2px solid rgba(184,133,42,0.22);
+    border: 2px solid rgba(185,146,58,0.22);
     color: var(--text-muted);
     font-family: 'Cinzel', serif;
     font-size: 0.78rem;
@@ -374,7 +374,7 @@ if (Astro.request.method === 'POST') {
   .step-line {
     flex: 1;
     height: 2px;
-    background: rgba(184,133,42,0.2);
+    background: rgba(185,146,58,0.2);
     min-width: 60px;
     max-width: 100px;
     margin-bottom: 1.2rem;
@@ -385,10 +385,10 @@ if (Astro.request.method === 'POST') {
 
   .panel-inner {
     background: var(--card-bg, #fffcf5);
-    border: 1px solid rgba(184,133,42,0.2);
+    border: 1px solid rgba(185,146,58,0.2);
     border-radius: 20px;
     padding: 2.5rem;
-    box-shadow: 0 4px 32px rgba(184,133,42,0.08);
+    box-shadow: 0 4px 32px rgba(185,146,58,0.08);
   }
 
   .panel-title {
@@ -396,7 +396,7 @@ if (Astro.request.method === 'POST') {
     letter-spacing: 2.5px;
     margin: 0 0 0.4rem;
     text-align: left;
-    border-bottom: 1px solid rgba(184,133,42,0.15);
+    border-bottom: 1px solid rgba(185,146,58,0.15);
     padding-bottom: 1rem;
   }
 
@@ -419,8 +419,8 @@ if (Astro.request.method === 'POST') {
     width: 64px;
     height: 64px;
     border-radius: 14px;
-    background: linear-gradient(135deg, #fdf0e0, #f0e2cc);
-    border: 1px solid rgba(184,133,42,0.22);
+    background: linear-gradient(135deg, rgba(167,139,250,0.18), rgba(185,146,58,0.12));
+    border: 1px solid rgba(185,146,58,0.22);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -434,9 +434,9 @@ if (Astro.request.method === 'POST') {
     font-size: 0.6rem;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    background: rgba(184,133,42,0.1);
+    background: rgba(185,146,58,0.10);
     color: var(--gold-mid);
-    border: 1px solid rgba(184,133,42,0.25);
+    border: 1px solid rgba(185,146,58,0.25);
     padding: 0.2rem 0.6rem;
     border-radius: 4px;
     display: inline-block;
@@ -510,7 +510,7 @@ if (Astro.request.method === 'POST') {
     align-items: center;
     gap: 0.85rem;
     padding: 0.85rem 1rem;
-    border: 1px solid rgba(184,133,42,0.15);
+    border: 1px solid rgba(185,146,58,0.15);
     border-radius: 10px;
     margin-bottom: 0.6rem;
     cursor: pointer;
@@ -518,8 +518,8 @@ if (Astro.request.method === 'POST') {
   }
   .picker-item:has(.picker-radio:checked),
   .picker-item:hover {
-    border-color: rgba(184,133,42,0.4);
-    background: rgba(184,133,42,0.05);
+    border-color: rgba(185,146,58,0.4);
+    background: rgba(185,146,58,0.05);
   }
   .picker-radio { display: none; }
   .picker-icon { font-size: 1.4rem; }
@@ -556,8 +556,8 @@ if (Astro.request.method === 'POST') {
   input[type="tel"],
   textarea {
     width: 100%;
-    background: rgba(253,247,236,0.6);
-    border: 1px solid rgba(184,133,42,0.22);
+    background: rgba(251,246,255,0.62);
+    border: 1px solid rgba(185,146,58,0.22);
     border-radius: 8px;
     padding: 0.8rem 1rem;
     color: var(--text);
@@ -568,9 +568,9 @@ if (Astro.request.method === 'POST') {
     outline: none;
   }
   input:focus, textarea:focus {
-    border-color: rgba(184,133,42,0.55);
-    background: rgba(255,252,245,0.9);
-    box-shadow: 0 0 0 3px rgba(184,133,42,0.08);
+    border-color: rgba(185,146,58,0.55);
+    background: rgba(255,252,250,0.92);
+    box-shadow: 0 0 0 3px rgba(109,40,217,0.08);
   }
   textarea { resize: vertical; min-height: 100px; }
 
@@ -594,22 +594,22 @@ if (Astro.request.method === 'POST') {
     align-items: center;
     gap: 1.25rem;
     padding: 1.25rem 1.5rem;
-    border: 2px solid rgba(184,133,42,0.18);
+    border: 2px solid rgba(185,146,58,0.18);
     border-radius: 12px;
     transition: all 0.25s;
-    background: rgba(253,247,236,0.5);
+    background: rgba(251,246,255,0.55);
   }
 
   .payment-option:hover .option-body,
   .payment-option.selected .option-body {
     border-color: var(--gold);
-    background: rgba(184,133,42,0.06);
-    box-shadow: 0 2px 16px rgba(184,133,42,0.1);
+    background: rgba(185,146,58,0.055);
+    box-shadow: 0 2px 16px rgba(185,146,58,0.10);
   }
 
   .payment-option.selected .option-body {
     border-color: var(--gold);
-    background: rgba(184,133,42,0.08);
+    background: rgba(185,146,58,0.075);
   }
 
   .option-logo {
@@ -640,8 +640,8 @@ if (Astro.request.method === 'POST') {
 
   /* ── Order summary box ── */
   .order-summary-box {
-    background: rgba(184,133,42,0.06);
-    border: 1px solid rgba(184,133,42,0.2);
+    background: rgba(185,146,58,0.06);
+    border: 1px solid rgba(185,146,58,0.2);
     border-radius: 10px;
     padding: 1rem 1.25rem;
     margin: 1.5rem 0;
@@ -711,7 +711,7 @@ if (Astro.request.method === 'POST') {
     gap: 0.4rem;
     padding: 0.9rem 1.5rem;
     background: transparent;
-    border: 1px solid rgba(184,133,42,0.3);
+    border: 1px solid rgba(185,146,58,0.3);
     color: var(--text-muted);
     border-radius: 8px;
     font-family: 'Cinzel', serif;
