@@ -278,14 +278,14 @@ const { title } = Astro.props;
   }
   .galaxy-nebulae {
     position: absolute;
-    inset: -25%;
+    inset: -45%;
     opacity: 0.9;
     mix-blend-mode: screen;
   }
   .galaxy-nebulae .neb {
     position: absolute;
-    width: 70vmax;
-    height: 70vmax;
+    width: 90vmax;
+    height: 90vmax;
     border-radius: 50%;
     filter: blur(55px);
     opacity: 0.55;
@@ -349,6 +349,17 @@ const { title } = Astro.props;
   @media (prefers-reduced-motion: reduce) {
     .galaxy-nebulae .neb { animation: none; }
     .shooting-star { display: none; }
+  }
+
+  /* Mobile: keep animated nebulae always covering viewport */
+  @media (max-width: 768px) {
+    .galaxy-nebulae { inset: -60%; }
+    .galaxy-nebulae .neb {
+      width: 110vmax;
+      height: 110vmax;
+      filter: blur(65px);
+      opacity: 0.6;
+    }
   }
 
   /* ── Scrollbar ── */
