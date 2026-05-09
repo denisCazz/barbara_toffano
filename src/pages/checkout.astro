@@ -1,15 +1,19 @@
 ﻿---
 import Layout from '../layouts/Layout.astro';
-import { products, getProductById } from '../data/products';
+import { getProductById, listActiveProducts } from '../lib/products';
 
 const productIdParam = Astro.url.searchParams.get('product');
 const selectedProductId = productIdParam ? Number(productIdParam) : null;
-const selectedProduct = selectedProductId ? getProductById(selectedProductId) : null;
+export const prerender = false;
+
+const selectedProduct = selectedProductId ? await getProductById(selectedProductId) : null;
+const allProducts = await listActiveProducts();
 
 const typeLabelMap: Record<string, string> = {
-  audio: 'Audio Personale',
-  carta: 'Lettura Carte',
-  pacchetto: 'Pacchetto',
+  consulto: 'Consulto',
+  meditazione: 'Meditazione',
+  lettura: 'Lettura',
+  vendita: 'Vendita',
 };
 
 if (Astro.request.method === 'POST') {
@@ -72,7 +76,7 @@ if (Astro.request.method === 'POST') {
               <div class="selected-product">
                 <div class="prod-icon-wrap">{selectedProduct.icon}</div>
                 <div class="prod-info">
-                  <span class="prod-badge">{typeLabelMap[selectedProduct.type]}</span>
+                  <span class="prod-badge">{typeLabelMap[selectedProduct.category]}</span>
                   <h3>{selectedProduct.name}</h3>
                   <p class="prod-desc">{selectedProduct.description}</p>
                   <ul class="prod-details">
@@ -87,7 +91,7 @@ if (Astro.request.method === 'POST') {
             ) : (
               <div class="product-picker">
                 <p class="picker-intro">Seleziona un prodotto per continuare:</p>
-                {products.map((p) => (
+                {allProducts.map((p) => (
                   <label class="picker-item" data-price={p.price}>
                     <input type="radio" name="product_select" value={p.id} class="picker-radio" />
                     <span class="picker-icon">{p.icon}</span>
@@ -181,6 +185,24 @@ if (Astro.request.method === 'POST') {
                   </div>
                 </div>
               </label>
+
+              <label class="payment-option" id="opt-postepay">
+                <input type="radio" name="payment_choice" value="postepay" class="payment-radio" />
+                <div class="option-body">
+                  <div class="option-logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="7" width="18" height="12" rx="2"/>
+                      <path d="M7 11h6"/>
+                      <path d="M7 15h10"/>
+                    </svg>
+                  </div>
+                  <div class="option-info">
+                    <strong>Postepay</strong>
+                    <span>Riceverai via email i dati Postepay e le istruzioni per completare il pagamento.</span>
+                  </div>
+                </div>
+              </label>
             </div>
 
             <!-- Riepilogo ordine finale -->
@@ -223,14 +245,13 @@ if (Astro.request.method === 'POST') {
   const selectedProductId = new URLSearchParams(window.location.search).get('product');
 
   // ── Product data (for picker summary) ──
-  const productPrices: Record<string, { name: string; price: string }> = {
-    '1': { name: 'Consulto Privato', price: '€35.00' },
-    '2': { name: 'Meditazione con Guarigione Energetica (ThetaHealing)', price: '€25.00' },
-    '3': { name: 'Lettura delle Rune', price: '€25.00' },
-    '4': { name: 'Lettura delle Carte degli Angeli', price: '€25.00' },
-    '5': { name: 'Lettura degli Oracoli', price: '€25.00' },
-    '6': { name: 'Vendita delle Carte (con consegna)', price: '€20.00' },
-  };
+  const productPrices: Record<string, { name: string; price: string }> = {};
+  const productsFromServer = JSON.parse(
+    (document.getElementById('products-json') as HTMLScriptElement)?.textContent || '[]',
+  ) as Array<{ id: number; name: string; price: number }>;
+  for (const p of productsFromServer) {
+    productPrices[String(p.id)] = { name: p.name, price: `€${Number(p.price).toFixed(2)}` };
+  }
 
   // ── DOM refs ──
   const panels = [1, 2, 3].map((n) => document.getElementById(`panel-${n}`)!);
@@ -297,6 +318,10 @@ if (Astro.request.method === 'POST') {
       r.closest('.payment-option')?.classList.add('selected');
     });
   });
+</script>
+
+<script type="application/json" id="products-json">
+  {JSON.stringify(allProducts.map((p) => ({ id: p.id, name: p.name, price: p.price })))}
 </script>
 
 <style>

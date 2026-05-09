@@ -1,18 +1,18 @@
 ﻿---
-import type { Product } from '../data/products';
+import type { Product } from '../lib/products';
 
 interface Props {
   product: Product;
 }
 const { product } = Astro.props;
 
-const typeLabelMap: Record<Product['type'], string> = {
+const typeLabelMap: Record<Product['category'], string> = {
   consulto: 'Consulto',
   meditazione: 'Meditazione',
   lettura: 'Lettura',
   vendita: 'Vendita',
 };
-const typeColorMap: Record<Product['type'], string> = {
+const typeColorMap: Record<Product['category'], string> = {
   consulto: 'badge-consulto',
   meditazione: 'badge-meditazione',
   lettura: 'badge-lettura',
@@ -24,7 +24,7 @@ const typeColorMap: Record<Product['type'], string> = {
   <div class="card-header">
     <div class="icon-area">{product.icon}</div>
     <div class="card-meta">
-      <span class={`type-badge ${typeColorMap[product.type]}`}>{typeLabelMap[product.type]}</span>
+      <span class={`type-badge ${typeColorMap[product.category]}`}>{typeLabelMap[product.category]}</span>
       <h3>{product.name}</h3>
     </div>
   </div>

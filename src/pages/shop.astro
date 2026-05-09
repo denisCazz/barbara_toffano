@@ -1,7 +1,11 @@
 ﻿---
 import Layout from '../layouts/Layout.astro';
 import ShopCard from '../components/ShopCard.astro';
-import { products } from '../data/products';
+import { listActiveProducts } from '../lib/products';
+
+export const prerender = false;
+
+const products = await listActiveProducts();
 ---
 
 <Layout title="Shop Mistico - Barbara Toffano">
@@ -45,7 +49,7 @@ import { products } from '../data/products';
       <div class="products-grid">
         {
           products.map((p) => (
-            <div class="product-wrapper" data-type={p.type}>
+            <div class="product-wrapper" data-type={p.category}>
               <ShopCard product={p} />
             </div>
           ))

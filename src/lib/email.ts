@@ -2,15 +2,55 @@
 
 let _resend: Resend | null = null;
 
+function env(name: string): string | undefined {
+  // @ts-expect-error - import.meta.env è un oggetto speciale Vite/Astro
+  return process.env[name] ?? import.meta.env?.[name];
+}
+
 function getResend(): Resend {
   if (!_resend) {
-    _resend = new Resend(import.meta.env.RESEND_API_KEY);
+    _resend = new Resend(env('RESEND_API_KEY'));
   }
   return _resend;
 }
 
-const FROM = () => import.meta.env.FROM_EMAIL || 'Barbara Toffano <noreply@barbaratoffano.it>';
-const SITE = () => import.meta.env.SITE_URL || 'http://localhost:4321';
+const FROM = () => env('FROM_EMAIL') || 'Barbara Toffano <noreply@barbaratoffano.it>';
+const SITE = () => env('SITE_URL') || 'http://localhost:4321';
+
+type PaymentMethod = 'paypal' | 'bonifico' | 'postepay' | 'non_specificato';
+
+function paymentLabel(method: PaymentMethod): string {
+  switch (method) {
+    case 'paypal':
+      return 'PayPal';
+    case 'bonifico':
+      return 'Bonifico Bancario';
+    case 'postepay':
+      return 'Postepay';
+    default:
+      return 'Da definire';
+  }
+}
+
+function paymentHtmlNote(method: PaymentMethod): string {
+  const postepay = env('POSTEPAY_INSTRUCTIONS')?.trim();
+  const bonifico = env('BONIFICO_INSTRUCTIONS')?.trim();
+
+  switch (method) {
+    case 'paypal':
+      return 'Ti invieremo a breve un link <strong>PayPal</strong> per completare il pagamento in modo sicuro.';
+    case 'bonifico':
+      return bonifico
+        ? bonifico
+        : 'Ti invieremo a breve le <strong>coordinate bancarie</strong> per effettuare il bonifico.';
+    case 'postepay':
+      return postepay
+        ? postepay
+        : 'Ti invieremo a breve i <strong>dati Postepay</strong> e le istruzioni per completare il pagamento.';
+    default:
+      return 'Ti contatteremo a breve con le istruzioni per completare il pagamento.';
+  }
+}
 
 /** Email conferma ordine al cliente */
 export async function sendOrderConfirmation(
@@ -19,12 +59,10 @@ export async function sendOrderConfirmation(
   orderNumber: string,
   productName: string,
   amount: number,
-  paymentMethod = 'Da definire',
+  paymentMethod: PaymentMethod = 'non_specificato',
 ): Promise<void> {
-  const paymentNote =
-    paymentMethod === 'PayPal'
-      ? 'Ti invieremo a breve un link <strong>PayPal</strong> per completare il pagamento in modo sicuro.'
-      : 'Ti invieremo a breve le <strong>coordinate bancarie</strong> per effettuare il bonifico.';
+  const paymentNote = paymentHtmlNote(paymentMethod);
+  const paymentMethodLabel = paymentLabel(paymentMethod);
 
   await getResend().emails.send({
     from: FROM(),
@@ -46,7 +84,7 @@ export async function sendOrderConfirmation(
       <table style="width:100%;border-collapse:collapse;">
         <tr><td style="padding:6px 0;color:#7a6248;font-size:13px;letter-spacing:1px;font-family:Arial,sans-serif;">NUMERO ORDINE</td><td style="padding:6px 0;color:#b8852a;font-weight:bold;text-align:right;font-family:Arial,sans-serif;">${orderNumber}</td></tr>
         <tr><td style="padding:6px 0;color:#7a6248;font-size:13px;letter-spacing:1px;font-family:Arial,sans-serif;">PRODOTTO</td><td style="padding:6px 0;color:#2b1d0e;text-align:right;">${productName}</td></tr>
-        <tr><td style="padding:6px 0;color:#7a6248;font-size:13px;letter-spacing:1px;font-family:Arial,sans-serif;">PAGAMENTO</td><td style="padding:6px 0;color:#2b1d0e;text-align:right;">${paymentMethod}</td></tr>
+        <tr><td style="padding:6px 0;color:#7a6248;font-size:13px;letter-spacing:1px;font-family:Arial,sans-serif;">PAGAMENTO</td><td style="padding:6px 0;color:#2b1d0e;text-align:right;">${paymentMethodLabel}</td></tr>
         <tr style="border-top:1px solid rgba(184,133,42,0.2);"><td style="padding:10px 0 0;color:#7a6248;font-size:13px;letter-spacing:1px;font-family:Arial,sans-serif;">IMPORTO</td><td style="padding:10px 0 0;color:#c05030;font-size:20px;font-weight:bold;text-align:right;font-family:Arial,sans-serif;">€${amount.toFixed(2)}</td></tr>
       </table>
     </div>
@@ -71,10 +109,11 @@ export async function sendAdminNotification(
   customerEmail: string,
   productName: string,
   amount: number,
-  paymentMethod = 'Non specificato',
+  paymentMethod: PaymentMethod = 'non_specificato',
 ): Promise<void> {
-  const adminEmail = import.meta.env.ADMIN_EMAIL;
+  const adminEmail = env('ADMIN_EMAIL');
   if (!adminEmail) return;
+  const paymentMethodLabel = paymentLabel(paymentMethod);
   await getResend().emails.send({
     from: FROM(),
     to: adminEmail,
@@ -90,7 +129,7 @@ export async function sendAdminNotification(
       <tr><td style="padding:8px 0;color:#666;">Cliente</td><td style="padding:8px 0;">${customerName}</td></tr>
       <tr><td style="padding:8px 0;color:#666;">Email</td><td style="padding:8px 0;"><a href="mailto:${customerEmail}" style="color:#5a189a;">${customerEmail}</a></td></tr>
       <tr><td style="padding:8px 0;color:#666;">Prodotto</td><td style="padding:8px 0;">${productName}</td></tr>
-      <tr><td style="padding:8px 0;color:#666;">Pagamento</td><td style="padding:8px 0;font-weight:bold;color:#c05030;">${paymentMethod}</td></tr>
+      <tr><td style="padding:8px 0;color:#666;">Pagamento</td><td style="padding:8px 0;font-weight:bold;color:#c05030;">${paymentMethodLabel}</td></tr>
       <tr style="border-top:2px solid #f0f0f0;"><td style="padding:12px 0 0;color:#666;font-weight:bold;">Importo</td><td style="padding:12px 0 0;font-size:20px;font-weight:bold;color:#b8852a;">€${amount.toFixed(2)}</td></tr>
     </table>
     <div style="margin-top:24px;">

@@ -82,6 +82,10 @@ const isAudioOrder = order.product_type === 'audio' || order.product_type === 'p
           <span class="info-label">Importo</span>
           <span class="info-value amount">€{Number(order.amount).toFixed(2)}</span>
         </div>
+        <div class="info-row">
+          <span class="info-label">Pagamento</span>
+          <span class="info-value type-cap">{order.payment_method || 'non_specificato'}</span>
+        </div>
       </div>
 
       <!-- Status Update -->

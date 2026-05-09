@@ -1,0 +1,88 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { listAllProducts } from '../../../lib/products';
+
+export const prerender = false;
+
+const products = await listAllProducts();
+
+function catLabel(c: string) {
+  return { consulto: 'Consulto', meditazione: 'Meditazione', lettura: 'Lettura', vendita: 'Vendita' }[c] || c;
+}
+function delLabel(d: string) {
+  return { audio: 'Audio', carta: 'Carta', pacchetto: 'Pacchetto' }[d] || d;
+}
+---
+
+<AdminLayout title="Prodotti" backHref="/admin/dashboard" backLabel="Dashboard">
+  <div class="a-toolbar">
+    <div class="left">
+      <h1>Prodotti</h1>
+      <span class="a-pill">Totale: <strong style="color:var(--a-text)">{products.length}</strong></span>
+    </div>
+    <div class="right">
+      <a class="btn btn-primary" href="/admin/prodotti/nuovo">+ Nuovo</a>
+    </div>
+  </div>
+
+  {products.length === 0 ? (
+    <div class="a-card" style="padding:1.25rem">
+      Nessun prodotto. Crea il primo con “Nuovo prodotto”.
+    </div>
+  ) : (
+    <div class="a-table-wrap">
+      <table class="a-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Categoria</th>
+            <th>Consegna</th>
+            <th class="a-td-right">Prezzo</th>
+            <th>Stato</th>
+            <th class="a-td-right">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((p) => (
+            <tr style={p.is_active ? '' : 'opacity:.75'}>
+              <td class="a-td-muted">{p.id}</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:.6rem">
+                  <span class="a-pill" style="color:var(--a-text)">{p.icon}</span>
+                  <a class="a-link" href={`/admin/prodotti/${p.id}`}>{p.name}</a>
+                  {p.featured && <span class="a-pill" style="border-color:rgba(242,201,76,.35);color:var(--a-gold)">Evidenza</span>}
+                </div>
+              </td>
+              <td><span class="a-pill">{catLabel(p.category)}</span></td>
+              <td><span class="a-pill">{delLabel(p.delivery_type)}</span></td>
+              <td class="a-td-right" style="font-weight:700">€{Number(p.price).toFixed(2)}</td>
+              <td>
+                {p.is_active ? (
+                  <span class="a-pill" style="border-color:rgba(34,197,94,.25);color:var(--a-green)">Attivo</span>
+                ) : (
+                  <span class="a-pill" style="border-color:rgba(239,68,68,.25);color:var(--a-red)">Disattivo</span>
+                )}
+              </td>
+              <td class="a-td-right" style="white-space:nowrap">
+                <a class="btn btn-outline" href={`/admin/prodotti/${p.id}`}>Modifica</a>
+                <form action="/api/admin/products/delete" method="POST" style="display:inline" onsubmit="return confirm('Eliminare il prodotto?')">
+                  <input type="hidden" name="id" value={p.id} />
+                  <button class="btn btn-danger" type="submit">Elimina</button>
+                </form>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</AdminLayout>
+
+<style>
+  @media (max-width: 980px) {
+    .a-table-wrap { overflow-x: auto; }
+    .a-table { min-width: 900px; }
+  }
+</style>
+

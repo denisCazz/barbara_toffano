@@ -5,6 +5,7 @@ interface Props {
   backLabel?: string;
 }
 const { title, backHref, backLabel } = Astro.props;
+const pathname = Astro.url.pathname;
 ---
 
 <!doctype html>
@@ -28,7 +29,8 @@ const { title, backHref, backLabel } = Astro.props;
         <span class="brand-name">Admin Panel</span>
       </div>
       <div class="nav-actions">
-        <a href="/admin/dashboard" class="nav-link">Ordini</a>
+        <a href="/admin/dashboard" class={`nav-link ${pathname.startsWith('/admin/dashboard') ? 'active' : ''}`}>Ordini</a>
+        <a href="/admin/prodotti" class={`nav-link ${pathname.startsWith('/admin/prodotti') ? 'active' : ''}`}>Prodotti</a>
         <form action="/api/admin/logout" method="POST" style="display:inline">
           <button type="submit" class="logout-btn">Esci</button>
         </form>
@@ -52,21 +54,23 @@ const { title, backHref, backLabel } = Astro.props;
   *, *::before, *::after { box-sizing: border-box; }
 
   :root {
-    --a-bg: #0e0e18;
-    --a-surface: #161622;
-    --a-surface-2: #1e1e2e;
-    --a-border: rgba(255,255,255,0.09);
-    --a-text: #e0e0f0;
-    --a-muted: #7070a0;
-    --a-accent: #a78bfa;
-    --a-gold: #d4af37;
-    --a-gold-dim: rgba(212,175,55,0.15);
+    /* Admin = più leggibile (contrasto e neutral) */
+    --a-bg: #0b0d12;
+    --a-surface: #121622;
+    --a-surface-2: #171c2c;
+    --a-border: rgba(255,255,255,0.10);
+    --a-text: #eef2ff;
+    --a-muted: rgba(238,242,255,0.68);
+    --a-accent: #8b5cf6;
+    --a-gold: #f2c94c;
+    --a-gold-dim: rgba(242,201,76,0.16);
     --a-green: #22c55e;
     --a-orange: #f97316;
     --a-blue: #60a5fa;
     --a-red: #ef4444;
     --a-radius: 10px;
     --a-radius-sm: 6px;
+    --a-shadow: 0 10px 30px rgba(0,0,0,0.28);
   }
 
   html, body {
@@ -74,23 +78,25 @@ const { title, backHref, backLabel } = Astro.props;
     padding: 0;
     background: var(--a-bg);
     color: var(--a-text);
-    font-family: 'Lora', Georgia, serif;
-    font-size: 15px;
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font-size: 16px;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
   }
 
-  /* More cursive writing in admin too (keep controls readable). */
-  p, li { font-style: italic; }
-  .nav-link, .brand-name, .btn, .a-label, .a-input, .a-textarea, .a-select, .logout-btn { font-style: normal; }
+  /* Admin leggibile: niente corsivo globale */
+  p, li { font-style: normal; }
 
   h1, h2, h3 {
-    font-family: 'Cinzel', serif;
-    color: var(--a-gold);
-    letter-spacing: 1px;
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color: var(--a-text);
+    letter-spacing: 0.2px;
     margin-top: 0;
     font-style: normal;
   }
+  h1 { font-size: 1.35rem; }
+  h2 { font-size: 1.1rem; }
+  h3 { font-size: 0.95rem; }
 
   /* Nav */
   .admin-nav {
@@ -102,7 +108,7 @@ const { title, backHref, backLabel } = Astro.props;
     justify-content: space-between;
     padding: 0 1.25rem;
     height: 56px;
-    background: rgba(14,14,24,0.95);
+    background: rgba(11,13,18,0.88);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--a-border);
   }
@@ -113,10 +119,10 @@ const { title, backHref, backLabel } = Astro.props;
   }
   .brand-star { color: var(--a-gold); font-size: 1rem; }
   .brand-name {
-    font-family: 'Cinzel', serif;
-    font-size: 0.85rem;
-    color: var(--a-gold);
-    letter-spacing: 2px;
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font-size: 0.9rem;
+    color: var(--a-text);
+    letter-spacing: 0.6px;
     text-transform: uppercase;
   }
   .nav-actions {
@@ -127,10 +133,26 @@ const { title, backHref, backLabel } = Astro.props;
   .nav-link {
     color: var(--a-muted);
     text-decoration: none;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     transition: color 0.2s;
   }
   .nav-link:hover { color: var(--a-text); }
+  .nav-link.active {
+    color: var(--a-text);
+    font-weight: 600;
+    position: relative;
+  }
+  .nav-link.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -18px;
+    height: 2px;
+    background: var(--a-accent);
+    opacity: 0.75;
+    border-radius: 2px;
+  }
   .logout-btn {
     background: none;
     border: 1px solid var(--a-border);
@@ -144,7 +166,7 @@ const { title, backHref, backLabel } = Astro.props;
   .logout-btn:hover { border-color: var(--a-red); color: var(--a-red); }
 
   .admin-main {
-    max-width: 900px;
+    max-width: 1120px;
     margin: 0 auto;
     padding: 1.5rem 1.25rem 4rem;
   }
@@ -167,6 +189,84 @@ const { title, backHref, backLabel } = Astro.props;
     border: 1px solid var(--a-border);
     border-radius: var(--a-radius);
     padding: 1.25rem;
+    box-shadow: var(--a-shadow);
+  }
+
+  /* Tables */
+  .a-table-wrap {
+    background: var(--a-surface);
+    border: 1px solid var(--a-border);
+    border-radius: var(--a-radius);
+    overflow: hidden;
+    box-shadow: var(--a-shadow);
+  }
+  .a-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  .a-table th,
+  .a-table td {
+    padding: 0.85rem 0.9rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    vertical-align: middle;
+  }
+  .a-table thead th {
+    text-align: left;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--a-muted);
+    background: rgba(255,255,255,0.02);
+    white-space: nowrap;
+  }
+  .a-table tbody tr:hover td {
+    background: rgba(139,92,246,0.06);
+  }
+  .a-table tbody tr:last-child td { border-bottom: none; }
+  .a-td-right { text-align: right; }
+  .a-td-muted { color: var(--a-muted); }
+  .a-link {
+    color: var(--a-text);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .a-link:hover { text-decoration: underline; }
+  .a-kbd {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 0.82rem;
+    padding: 0.18rem 0.45rem;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    color: var(--a-text);
+  }
+
+  /* Toolbar */
+  .a-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .a-toolbar h1 { margin: 0; }
+  .a-toolbar .left { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+  .a-toolbar .right { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+
+  /* Small pills */
+  .a-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.03);
+    font-size: 0.78rem;
+    color: var(--a-muted);
+    white-space: nowrap;
   }
 
   /* Status badges */
@@ -236,8 +336,8 @@ const { title, backHref, backLabel } = Astro.props;
     border: 1px solid var(--a-border);
     border-radius: var(--a-radius-sm);
     color: var(--a-text);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
+    font-family: inherit;
+    font-size: 0.95rem;
     padding: 0.65rem 0.9rem;
     transition: border-color 0.2s;
     appearance: auto;
@@ -249,7 +349,7 @@ const { title, backHref, backLabel } = Astro.props;
   .a-textarea { resize: vertical; min-height: 90px; }
   .a-label {
     display: block;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--a-muted);
     margin-bottom: 0.4rem;
     letter-spacing: 0.5px;

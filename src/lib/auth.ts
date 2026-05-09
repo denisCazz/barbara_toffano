@@ -1,6 +1,11 @@
 import { randomBytes } from 'crypto';
 import { getDb } from './db';
 
+function env(name: string): string | undefined {
+  // @ts-expect-error - import.meta.env è un oggetto speciale Vite/Astro
+  return process.env[name] ?? import.meta.env?.[name];
+}
+
 /** Crea una sessione admin e restituisce il token */
 export async function createSession(): Promise<string> {
   const token = randomBytes(40).toString('hex');
@@ -21,7 +26,7 @@ export async function deleteSession(token: string): Promise<void> {
 
 /** Verifica la password admin (confronto costante per sicurezza) */
 export function verifyAdminPassword(password: string): boolean {
-  const adminPassword = import.meta.env.ADMIN_PASSWORD;
+  const adminPassword = env('ADMIN_PASSWORD');
   if (!adminPassword || !password) return false;
   // Confronto a lunghezza costante per prevenire timing attacks
   if (password.length !== adminPassword.length) return false;
