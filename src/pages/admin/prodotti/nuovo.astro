@@ -57,7 +57,18 @@ export const prerender = false;
 
       <div class="form-group">
         <label class="a-label">Dettagli (uno per riga)</label>
-        <textarea class="a-textarea" name="details" rows="4" placeholder="Es:\nSessione privata\nRiscontro entro 24h"></textarea>
+        <textarea class="a-textarea" name="details" rows="4" placeholder="Es:\nSessione privata\nRiscontro entro 48h"></textarea>
+      </div>
+
+      <div class="grid">
+        <div class="form-group">
+          <label class="a-label">Link “Scopri di più” (opzionale, es. video YouTube)</label>
+          <input class="a-input" type="url" name="info_url" placeholder="https://..." />
+        </div>
+        <div class="form-group">
+          <label class="a-label">Testo pulsante link</label>
+          <input class="a-input" name="info_label" placeholder="Scopri di più (video sul mazzo)" />
+        </div>
       </div>
 
       <div class="checks">

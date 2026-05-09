@@ -82,6 +82,13 @@ if (Astro.request.method === 'POST') {
                   <ul class="prod-details">
                     {selectedProduct.details.map((d) => <li>◆ {d}</li>)}
                   </ul>
+                  {selectedProduct.info_url ? (
+                    <p class="prod-more">
+                      <a href={selectedProduct.info_url} target="_blank" rel="noopener noreferrer" class="prod-more-link">
+                        {selectedProduct.info_label?.trim() || 'Scopri di più'} →
+                      </a>
+                    </p>
+                  ) : null}
                   <div class="prod-price-row">
                     <span class="prod-price">€{selectedProduct.price.toFixed(2)}</span>
                     <a href="/shop" class="change-link">Cambia prodotto</a>
@@ -222,7 +229,7 @@ if (Astro.request.method === 'POST') {
             </div>
 
             <p class="submit-note">
-              Riceverai una email di conferma. Barbara ti risponderà entro 24 ore.
+              Riceverai una email di conferma. Riscontro in genere entro <strong>48 ore</strong>, preferibilmente negli orari <strong>9–12</strong> e <strong>15–17</strong>.
             </p>
           </div>
         </div>
@@ -235,6 +242,7 @@ if (Astro.request.method === 'POST') {
     <div class="container">
       <div class="footer-content">
         <div class="footer-logo">Barbara Toffano</div>
+        <p class="footer-hours">Orari: <strong>9–12</strong> · <strong>15–17</strong></p>
         <p>&copy; {new Date().getFullYear()} Barbara Toffano. Tutti i diritti riservati.</p>
       </div>
     </div>
@@ -494,6 +502,23 @@ if (Astro.request.method === 'POST') {
   .prod-details li {
     font-size: 0.85rem;
     color: var(--text-muted);
+  }
+
+  .prod-more {
+    margin: 0 0 1rem;
+    font-size: 0.88rem;
+  }
+  .prod-more-link {
+    color: var(--accent-mid);
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(109, 40, 217, 0.35);
+  }
+  .prod-more-link:hover {
+    color: var(--accent);
   }
 
   .prod-price-row {

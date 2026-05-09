@@ -79,7 +79,7 @@ export async function sendOrderConfirmation(
       <h1 style="color:#b8852a;font-size:24px;margin:0;letter-spacing:3px;font-family:Georgia,serif;">ORDINE RICEVUTO</h1>
     </div>
     <p style="color:#c05030;font-size:20px;text-align:center;margin-bottom:16px;font-style:italic;">Cara ${customerName},</p>
-    <p style="line-height:1.75;color:#7a6248;">Ho ricevuto il tuo ordine con grande gioia. Elaborerò la tua richiesta con cura, dedizione e tutta la mia luce.</p>
+    <p style="line-height:1.75;color:#7a6248;">Ho ricevuto il tuo ordine con grande gioia. Elaborerò la tua richiesta con cura, dedizione e tutta la mia luce. Riscontro in genere entro <strong>48 ore</strong> (orario disponibilità 9–12 e 15–17).</p>
     <div style="background:#fffcf5;border:1px solid rgba(184,133,42,0.3);border-left:4px solid #b8852a;border-radius:8px;padding:20px;margin:24px 0;">
       <table style="width:100%;border-collapse:collapse;">
         <tr><td style="padding:6px 0;color:#7a6248;font-size:13px;letter-spacing:1px;font-family:Arial,sans-serif;">NUMERO ORDINE</td><td style="padding:6px 0;color:#b8852a;font-weight:bold;text-align:right;font-family:Arial,sans-serif;">${orderNumber}</td></tr>
@@ -91,7 +91,7 @@ export async function sendOrderConfirmation(
     <div style="background:#fff8f0;border:1px solid rgba(192,80,48,0.2);border-radius:8px;padding:16px;margin-bottom:20px;">
       <p style="margin:0;color:#7a6248;line-height:1.65;font-size:15px;">📋 <strong style="color:#2b1d0e;">Istruzioni pagamento:</strong><br/>${paymentNote}</p>
     </div>
-    <p style="line-height:1.75;color:#7a6248;">Per qualsiasi necessità puoi scrivermi su <a href="https://wa.me/393297813392" style="color:#b8852a;">WhatsApp</a>. Rispondo personalmente a ogni messaggio.</p>
+    <p style="line-height:1.75;color:#7a6248;">Per qualsiasi necessità puoi scrivermi su <a href="https://wa.me/393297813392" style="color:#b8852a;">WhatsApp</a>, nel rispetto degli orari 9–12 e 15–17 quando possibile. Rispondo personalmente.</p>
     <div style="text-align:center;margin-top:36px;padding-top:24px;border-top:1px solid rgba(184,133,42,0.2);">
       <p style="color:#b8852a;font-size:20px;margin:0;letter-spacing:3px;">✦ Con Amore e Luce ✦</p>
       <p style="color:#7a6248;font-size:14px;margin:8px 0 0;">Barbara Toffano</p>

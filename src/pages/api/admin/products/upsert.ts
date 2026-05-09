@@ -44,6 +44,8 @@ export const POST: APIRoute = async ({ request }) => {
   const featured = formData.get('featured') ? true : false;
   const isActive = formData.get('is_active') ? true : false;
   const details = parseDetails((formData.get('details') as string | null) ?? null);
+  const infoUrl = String(formData.get('info_url') || '').trim() || null;
+  const infoLabel = String(formData.get('info_label') || '').trim() || null;
 
   if (!name || !description || !Number.isFinite(price) || price < 0) {
     return new Response(JSON.stringify({ error: 'Dati non validi' }), { status: 400 });
@@ -60,6 +62,8 @@ export const POST: APIRoute = async ({ request }) => {
     delivery_type: deliveryRaw,
     icon,
     details,
+    info_url: infoUrl,
+    info_label: infoLabel,
     featured,
     is_active: isActive,
     sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,

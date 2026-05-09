@@ -73,6 +73,17 @@ function detailsText(details: string[]) {
         <textarea class="a-textarea" name="details" rows="4">{detailsText(product.details)}</textarea>
       </div>
 
+      <div class="grid">
+        <div class="form-group">
+          <label class="a-label">Link “Scopri di più” (opzionale)</label>
+          <input class="a-input" type="url" name="info_url" value={product.info_url ?? ''} placeholder="https://..." />
+        </div>
+        <div class="form-group">
+          <label class="a-label">Testo pulsante link</label>
+          <input class="a-input" name="info_label" value={product.info_label ?? ''} placeholder="Scopri di più (video sul mazzo)" />
+        </div>
+      </div>
+
       <div class="checks">
         <label class="check"><input type="checkbox" name="featured" value="1" checked={product.featured} /> In evidenza</label>
         <label class="check"><input type="checkbox" name="is_active" value="1" checked={product.is_active} /> Attivo</label>

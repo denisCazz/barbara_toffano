@@ -37,6 +37,16 @@ const typeColorMap: Record<Product['category'], string> = {
     ))}
   </ul>
 
+  {
+    product.info_url && (
+      <p class="info-more">
+        <a href={product.info_url} target="_blank" rel="noopener noreferrer" class="info-more-link">
+          {product.info_label?.trim() || 'Scopri di più'} →
+        </a>
+      </p>
+    )
+  }
+
   <div class="card-footer">
     <span class="price">€{product.price.toFixed(2)}</span>
     <a href={`/checkout?product=${product.id}`} class="buy-btn">
@@ -206,4 +216,23 @@ const typeColorMap: Record<Product['category'], string> = {
   }
   .arr { transition: transform 0.25s; }
   .buy-btn:hover .arr { transform: translateX(4px); }
+
+  .info-more {
+    margin: 0 0 1rem;
+    font-size: 0.86rem;
+  }
+  .info-more-link {
+    color: var(--accent-mid);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(109,40,217,0.35);
+    padding-bottom: 2px;
+  }
+  .info-more-link:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
 </style>

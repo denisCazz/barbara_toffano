@@ -13,8 +13,9 @@ const orderNumber = Astro.url.searchParams.get('order') ?? '';
         <p class="script-font">Grazie per la tua fiducia</p>
         {orderNumber && <p class="order-num">Numero ordine: <strong>{orderNumber}</strong></p>}
         <p class="message">
-          Ho ricevuto la tua richiesta con grande gioia. Riceverai a breve una email di conferma. Ti contatterò per le istruzioni di pagamento e ti aggiornerò non appena il tuo materiale sarà pronto.
+          Ho ricevuto la tua richiesta con grande gioia. Riceverai a breve una email di conferma. Ti contatterò per le istruzioni di pagamento e ti aggiornerò sul materiale — in genere con un riscontro entro <strong>48 ore</strong> (nell’orario 9–12 e 15–17).
         </p>
+        <p class="hours-hint">Messaggi e riscontri: <strong>9–12</strong> e <strong>15–17</strong></p>
         <a href="https://wa.me/393297813392" class="wa-btn">
           Scrivi su WhatsApp
         </a>
@@ -77,8 +78,15 @@ const orderNumber = Astro.url.searchParams.get('order') ?? '';
     color: var(--text-muted);
     line-height: 1.8;
     font-size: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
   }
+  .hours-hint {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0 0 1.25rem;
+    line-height: 1.5;
+  }
+  .hours-hint strong { color: var(--accent); }
   .wa-btn {
     display: inline-flex;
     align-items: center;

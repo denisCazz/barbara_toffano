@@ -1,3 +1,4 @@
+/** Copia statica di riferimento (lo shop pubblico usa i prodotti da MySQL). */
 export interface Product {
   id: number;
   name: string;
@@ -14,22 +15,22 @@ export const products: Product[] = [
     id: 1,
     name: 'Consulto Privato',
     description:
-      'Un consulto privato e riservato per fare chiarezza su amore, lavoro e percorso di vita. Un momento dedicato a te, con ascolto profondo e guida intuitiva.',
+      'Un consulto privato e riservato per fare chiarezza su amore, lavoro e percorso di vita. Non effettuo consulti su gravidanza o sulla salute fisica/medica (per questo rivolgiti a professionisti sanitari).',
     price: 35,
     type: 'consulto',
     icon: '🔮',
-    details: ['Sessione privata', 'Chiarezza su 1–3 temi', 'Riscontro entro 24h'],
+    details: ['Sessione privata', 'Chiarezza su 1–3 temi', 'Riscontro entro 48h', 'No consulti su gravidanza o salute'],
     featured: true,
   },
   {
     id: 2,
     name: 'Meditazione con Guarigione Energetica (ThetaHealing)',
     description:
-      'Meditazione guidata con guarigione energetica in ThetaHealing per sciogliere blocchi, ritrovare centratura e alleggerire mente e cuore.',
+      'Meditazione guidata con guarigione energetica in ThetaHealing: tecnica sulla sostituzione delle convinzioni errate, per sciogliere blocchi e ritrovare centratura.',
     price: 25,
     type: 'meditazione',
     icon: '🪷',
-    details: ['Percorso guidato', 'Riequilibrio energetico', 'Rilascio e centratura'],
+    details: ['Percorso guidato', 'ThetaHealing: sostituzione delle convinzioni errate', 'Riequilibrio energetico', 'Responso entro 48h'],
     featured: true,
   },
   {
@@ -56,24 +57,24 @@ export const products: Product[] = [
   },
   {
     id: 5,
-    name: 'Lettura degli Oracoli',
+    name: 'Lettura — Le Bambole Lunatiche',
     description:
-      'Una lettura con oracoli per ricevere risposte e conferme: utile quando senti bisogno di direzione, protezione e significato.',
+      'Lettura con un unico mazzo di carte libere e interpretazione libera. Il mazzo si chiama «Le Bambole Lunatiche».',
     price: 25,
     type: 'lettura',
     icon: '🌙',
-    details: ['Responso immediato', 'Consiglio per il momento', 'Energia della settimana'],
+    details: ['Unico mazzo: Le Bambole Lunatiche', 'Carte libere, interpretazione libera', 'Responso entro 48h'],
     featured: true,
   },
   {
     id: 6,
-    name: 'Vendita delle Carte (con consegna)',
+    name: 'Vendita mazzo «Le Bambole Lunatiche» (con consegna)',
     description:
-      'Acquista le carte e ricevi la consegna direttamente a casa. Perfette per iniziare (o approfondire) il tuo percorso di lettura.',
+      'Acquista il mazzo illustrato «Le Bambole Lunatiche» con consegna a casa.',
     price: 20,
     type: 'vendita',
     icon: '🎴',
-    details: ['Carte selezionate', 'Consegna inclusa', 'Assistenza per scegliere'],
+    details: ['Mazzo cartaceo delle Bambole Lunatiche', 'Catalogo disponibile', 'Consegna inclusa'],
     featured: true,
   },
 ];

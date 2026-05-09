@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS products (
   delivery_type ENUM('audio','carta','pacchetto') NOT NULL DEFAULT 'carta',
   icon          VARCHAR(50)   NOT NULL DEFAULT '✦',
   details_json  JSON          NULL,
+  info_url      VARCHAR(600)  NULL      COMMENT 'Link opzionale (es. video)',
+  info_label    VARCHAR(120)  NULL      COMMENT 'Etichetta link',
   featured      TINYINT(1)    NOT NULL DEFAULT 0,
   is_active     TINYINT(1)    NOT NULL DEFAULT 1,
   sort_order    INT           NOT NULL DEFAULT 0,
