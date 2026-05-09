@@ -1,19 +1,70 @@
 ﻿---
 interface Props {
   title: string;
+  description?: string;
+  /** Percorso o URL assoluto immagine OG (default /logo.jpeg) */
+  image?: string;
+  imageAlt?: string;
+  ogType?: 'website' | 'article';
+  noindex?: boolean;
+  keywords?: string;
 }
-const { title } = Astro.props;
+
+const SITE_DEFAULT =
+  (typeof process !== 'undefined' ? process.env.SITE_URL : undefined)?.replace(/\/+$/, '').trim() || '';
+
+function siteOrigin(): URL {
+  if (SITE_DEFAULT) return new URL(SITE_DEFAULT.endsWith('/') ? SITE_DEFAULT : `${SITE_DEFAULT}/`);
+  if (Astro.site) return Astro.site;
+  return new URL(`${Astro.url.origin}/`);
+}
+
+const originBase = siteOrigin();
+const ogBase = originBase.origin;
+const {
+  title,
+  description = 'Tarologia e lettura delle carte con Barbara Toffano: consulti, carte angeli e oracoli, ThetaHealing, mazzo «Le Bambole Lunatiche». Shop online e percorsi con responso in 48h.',
+  image = '/logo.jpeg',
+  imageAlt = 'Barbara Toffano — tarologia e lettura carte',
+  ogType = 'website',
+  noindex = false,
+  keywords =
+    'tarologia, Barbara Toffano, lettura carte, tarocchi, carte degli angeli, oracoli, ThetaHealing, consulto tarologico, Bambole Lunatiche',
+} = Astro.props;
+
+const canonPath = `${Astro.url.pathname}${Astro.url.search}`;
+const canonicalURL = new URL(canonPath || '/', originBase.href).href;
+const ogImagePath = image.startsWith('http') ? image : `${ogBase}${image.startsWith('/') ? image : `/${image}`}`;
+const pageTitleFull = title.includes('Barbara') ? title : `${title} | Barbara Toffano`;
 ---
 
 <!doctype html>
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Astrologia, Tarocchi e Rituali Magici con Barbara Toffano" />
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <meta name="author" content="Barbara Toffano" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {noindex ? <meta name="robots" content="noindex, nofollow" /> : <meta name="robots" content="index, follow" />}
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+    <title>{pageTitleFull}</title>
+
+    <meta property="og:site_name" content="Barbara Toffano" />
+    <meta property="og:title" content={pageTitleFull} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:locale" content="it_IT" />
+    <meta property="og:image" content={ogImagePath} />
+    <meta property="og:image:alt" content={imageAlt} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitleFull} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImagePath} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
