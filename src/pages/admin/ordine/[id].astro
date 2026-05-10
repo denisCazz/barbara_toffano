@@ -106,7 +106,7 @@ const isAudioOrder = order.product_type === 'audio' || order.product_type === 'p
             <label class="a-label">Note Interne</label>
             <textarea name="admin_notes" class="a-textarea" placeholder="Note visibili solo a te...">{order.admin_notes || ''}</textarea>
           </div>
-          <button type="submit" class="btn btn-outline">Salva Modifiche</button>
+          <button type="submit" class="btn btn-outline btn-full">Salva Modifiche</button>
         </form>
       </div>
     </div>
@@ -212,7 +212,7 @@ const isAudioOrder = order.product_type === 'audio' || order.product_type === 'p
         <div class="a-card section-card">
           <h3>📄 Questo ordine non prevede audio</h3>
           <p class="no-audio-msg">Il prodotto ordinato è una lettura/report. Consegna il materiale via email direttamente.</p>
-          <a href={`mailto:${order.customer_email}`} class="btn btn-primary">
+          <a href={`mailto:${order.customer_email}`} class="btn btn-primary btn-full">
             ✉ Invia Email al Cliente
           </a>
         </div>
@@ -421,48 +421,79 @@ const isAudioOrder = order.product_type === 'audio' || order.product_type === 'p
 </script>
 
 <style>
-  .order-header { margin-bottom: 1.5rem; }
+  /* mobile-first: tutto stack verticale, scaling a md+ */
+  .order-header { margin-bottom: 1.25rem; }
   .order-id-row {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
     flex-wrap: wrap;
   }
-  .order-id-row h1 { font-size: 1.3rem; margin: 0; }
+  .order-id-row h1 { font-size: 1.15rem; margin: 0; word-break: break-all; }
   .order-date { color: var(--a-muted); font-size: 0.82rem; margin: 0.3rem 0 0; }
 
   .order-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
+    grid-template-columns: 1fr;
+    gap: 1rem;
     align-items: start;
   }
 
-  .section-card { margin-bottom: 1.1rem; }
+  .section-card { margin-bottom: 0; }
   .section-card h3 {
-    font-size: 0.9rem;
-    letter-spacing: 1.5px;
-    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    letter-spacing: 1.2px;
+    margin-bottom: 0.9rem;
     color: var(--a-muted);
     text-transform: uppercase;
   }
 
   .info-row {
     display: flex;
-    gap: 0.75rem;
+    flex-direction: column;
+    gap: 0.2rem;
     padding: 0.55rem 0;
     border-bottom: 1px solid var(--a-border);
-    align-items: flex-start;
   }
   .info-row:last-child { border-bottom: none; }
-  .info-label { font-size: 0.78rem; color: var(--a-muted); min-width: 80px; flex-shrink: 0; padding-top: 1px; }
-  .info-value { font-size: 0.9rem; color: var(--a-text); }
-  .info-link { color: var(--a-blue); font-size: 0.9rem; text-decoration: none; }
+  .info-label {
+    font-size: 0.7rem;
+    color: var(--a-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .info-value { font-size: 0.95rem; color: var(--a-text); word-break: break-word; }
+  .info-link { color: var(--a-blue); font-size: 0.95rem; text-decoration: none; word-break: break-all; }
   .info-link:hover { text-decoration: underline; }
-  .amount { font-family: 'Cinzel', serif; color: var(--a-gold); font-size: 1rem; }
+  .amount { font-family: 'Cinzel', serif; color: var(--a-gold); font-size: 1.05rem; }
   .type-cap { text-transform: capitalize; }
-  .customer-notes { color: var(--a-muted); font-size: 0.88rem; margin: 0; line-height: 1.5; }
-  .notes-row { flex-direction: column; gap: 0.3rem; }
+  .customer-notes { color: var(--a-muted); font-size: 0.9rem; margin: 0; line-height: 1.55; }
+  .notes-row { gap: 0.3rem; }
+
+  @media (min-width: 720px) {
+    .order-id-row h1 { font-size: 1.3rem; word-break: normal; }
+    .info-row {
+      flex-direction: row;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+    .info-label {
+      min-width: 90px;
+      flex-shrink: 0;
+      padding-top: 2px;
+      font-size: 0.78rem;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .info-value, .info-link { font-size: 0.9rem; }
+  }
+
+  @media (min-width: 980px) {
+    .order-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+  }
 
   /* Audio section */
   .audio-section h3 { color: var(--a-text); }
@@ -555,8 +586,11 @@ const isAudioOrder = order.product_type === 'audio' || order.product_type === 'p
   }
 
   .audio-player { width: 100%; margin: 0.75rem 0; }
-  .rec-actions { display: flex; gap: 0.75rem; }
+  .rec-actions { display: flex; flex-direction: column; gap: 0.6rem; }
   .rec-actions .btn { flex: 1; }
+  @media (min-width: 480px) {
+    .rec-actions { flex-direction: row; gap: 0.75rem; }
+  }
 
   /* Progress */
   .progress-bar {
@@ -593,9 +627,4 @@ const isAudioOrder = order.product_type === 'audio' || order.product_type === 'p
   .already-sent { color: var(--a-green); font-size: 0.8rem; text-align: center; margin-top: 0.5rem; }
 
   .no-audio-msg { color: var(--a-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem; }
-
-  @media (max-width: 640px) {
-    .order-grid { grid-template-columns: 1fr; }
-    .rec-actions { flex-direction: column; }
-  }
 </style>

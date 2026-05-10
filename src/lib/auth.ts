@@ -24,6 +24,21 @@ export async function deleteSession(token: string): Promise<void> {
   await db.execute('DELETE FROM admin_sessions WHERE token = ?', [token]);
 }
 
+/** Restituisce true se il token corrisponde a una sessione admin valida e non scaduta */
+export async function isValidSession(token: string | undefined | null): Promise<boolean> {
+  if (!token) return false;
+  try {
+    const db = getDb();
+    const [rows] = await db.execute(
+      'SELECT id FROM admin_sessions WHERE token = ? AND expires_at > NOW()',
+      [token],
+    );
+    return Array.isArray(rows) && rows.length > 0;
+  } catch {
+    return false;
+  }
+}
+
 /** Verifica la password admin (confronto costante per sicurezza) */
 export function verifyAdminPassword(password: string): boolean {
   const adminPassword = env('ADMIN_PASSWORD');

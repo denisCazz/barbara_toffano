@@ -26,12 +26,12 @@ function delLabel(d: string) {
   </div>
 
   {products.length === 0 ? (
-    <div class="a-card" style="padding:1.25rem">
+    <div class="a-card">
       Nessun prodotto. Crea il primo con “Nuovo prodotto”.
     </div>
   ) : (
     <div class="a-table-wrap">
-      <table class="a-table">
+      <table class="a-table is-stack-mobile">
         <thead>
           <tr>
             <th>ID</th>
@@ -46,27 +46,27 @@ function delLabel(d: string) {
         <tbody>
           {products.map((p) => (
             <tr style={p.is_active ? '' : 'opacity:.75'}>
-              <td class="a-td-muted">{p.id}</td>
-              <td>
-                <div style="display:flex;align-items:center;gap:.6rem">
+              <td data-label="ID" class="a-td-muted">{p.id}</td>
+              <td data-label="Nome" class="cell-block">
+                <div class="prod-name-row">
                   <span class="a-pill" style="color:var(--a-text)">{p.icon}</span>
                   <a class="a-link" href={`/admin/prodotti/${p.id}`}>{p.name}</a>
                   {p.featured && <span class="a-pill" style="border-color:rgba(242,201,76,.35);color:var(--a-gold)">Evidenza</span>}
                 </div>
               </td>
-              <td><span class="a-pill">{catLabel(p.category)}</span></td>
-              <td><span class="a-pill">{delLabel(p.delivery_type)}</span></td>
-              <td class="a-td-right" style="font-weight:700">€{Number(p.price).toFixed(2)}</td>
-              <td>
+              <td data-label="Categoria"><span class="a-pill">{catLabel(p.category)}</span></td>
+              <td data-label="Consegna"><span class="a-pill">{delLabel(p.delivery_type)}</span></td>
+              <td data-label="Prezzo" class="a-td-right" style="font-weight:700">€{Number(p.price).toFixed(2)}</td>
+              <td data-label="Stato">
                 {p.is_active ? (
                   <span class="a-pill" style="border-color:rgba(34,197,94,.25);color:var(--a-green)">Attivo</span>
                 ) : (
                   <span class="a-pill" style="border-color:rgba(239,68,68,.25);color:var(--a-red)">Disattivo</span>
                 )}
               </td>
-              <td class="a-td-right" style="white-space:nowrap">
+              <td class="a-td-right cell-actions">
                 <a class="btn btn-outline" href={`/admin/prodotti/${p.id}`}>Modifica</a>
-                <form action="/api/admin/products/delete" method="POST" style="display:inline" onsubmit="return confirm('Eliminare il prodotto?')">
+                <form action="/api/admin/products/delete" method="POST" onsubmit="return confirm('Eliminare il prodotto?')">
                   <input type="hidden" name="id" value={p.id} />
                   <button class="btn btn-danger" type="submit">Elimina</button>
                 </form>
@@ -80,9 +80,16 @@ function delLabel(d: string) {
 </AdminLayout>
 
 <style>
-  @media (max-width: 980px) {
-    .a-table-wrap { overflow-x: auto; }
-    .a-table { min-width: 900px; }
+  .prod-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+  }
+
+  /* Desktop: actions affiancate */
+  @media (min-width: 768px) {
+    td.cell-actions { white-space: nowrap; }
+    td.cell-actions form { display: inline; margin-left: 0.4rem; }
   }
 </style>
-

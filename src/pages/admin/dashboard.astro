@@ -68,9 +68,12 @@ function paymentLabel(m: string) {
       <span class="a-pill">Totale: <strong style="color:var(--a-text)">{totalCount}</strong></span>
     </div>
     <div class="right">
+      <button type="button" id="cleanup-btn" class="btn btn-outline">Pulisci audio &gt;30g</button>
       <a href="/admin/dashboard" class="btn btn-outline">Aggiorna</a>
     </div>
   </div>
+
+  <div id="cleanup-feedback" class="cleanup-feedback" style="display:none"></div>
 
   <!-- Stats -->
   <div class="stats">
@@ -98,12 +101,12 @@ function paymentLabel(m: string) {
 
   {
     orders.length === 0 ? (
-      <div class="empty-state">
-        <p class="a-td-muted">Nessun ordine trovato.</p>
+      <div class="a-card empty-state">
+        <p class="a-td-muted" style="margin:0">Nessun ordine trovato.</p>
       </div>
     ) : (
       <div class="a-table-wrap">
-        <table class="a-table">
+        <table class="a-table is-stack-mobile">
           <thead>
             <tr>
               <th>Ordine</th>
@@ -119,20 +122,20 @@ function paymentLabel(m: string) {
           <tbody>
             {orders.map((o) => (
               <tr>
-                <td><span class="a-kbd">{o.order_number}</span></td>
-                <td>
+                <td data-label="Ordine"><span class="a-kbd">{o.order_number}</span></td>
+                <td data-label="Cliente" class="cell-block">
                   <div style="font-weight:600">{o.customer_name}</div>
-                  <div class="a-td-muted" style="font-size:.85rem">{o.customer_email}</div>
+                  <div class="a-td-muted" style="font-size:.85rem;word-break:break-word">{o.customer_email}</div>
                 </td>
-                <td>
+                <td data-label="Prodotto" class="cell-block">
                   <div style="font-weight:600">{o.product_name}</div>
                   <div class="a-td-muted" style="font-size:.85rem">{o.product_type}</div>
                 </td>
-                <td><span class="a-pill">{paymentLabel(o.payment_method)}</span></td>
-                <td class="a-td-right" style="font-weight:700">€{Number(o.amount).toFixed(2)}</td>
-                <td><span class={`badge ${badgeClass(o.status)}`}>{statusLabel(o.status)}</span></td>
-                <td class="a-td-muted">{formatDate(o.created_at)}</td>
-                <td class="a-td-right"><a class="btn btn-outline" href={`/admin/ordine/${o.id}`}>Apri</a></td>
+                <td data-label="Pagamento"><span class="a-pill">{paymentLabel(o.payment_method)}</span></td>
+                <td data-label="Importo" class="a-td-right" style="font-weight:700">€{Number(o.amount).toFixed(2)}</td>
+                <td data-label="Stato"><span class={`badge ${badgeClass(o.status)}`}>{statusLabel(o.status)}</span></td>
+                <td data-label="Data" class="a-td-muted">{formatDate(o.created_at)}</td>
+                <td class="a-td-right cell-actions"><a class="btn btn-outline" href={`/admin/ordine/${o.id}`}>Apri</a></td>
               </tr>
             ))}
           </tbody>
@@ -142,11 +145,66 @@ function paymentLabel(m: string) {
   }
 </AdminLayout>
 
+<script>
+  const btn = document.getElementById('cleanup-btn') as HTMLButtonElement | null;
+  const feedback = document.getElementById('cleanup-feedback') as HTMLDivElement | null;
+
+  function showFeedback(msg: string, kind: 'ok' | 'err' | 'info') {
+    if (!feedback) return;
+    feedback.textContent = msg;
+    feedback.className = `cleanup-feedback cleanup-${kind}`;
+    feedback.style.display = 'block';
+    if (kind !== 'err') {
+      window.setTimeout(() => { feedback.style.display = 'none'; }, 6000);
+    }
+  }
+
+  btn?.addEventListener('click', async () => {
+    if (!confirm('Eliminare tutti i file audio piu\' vecchi di 30 giorni? Operazione non reversibile.')) return;
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Pulizia in corso...';
+    try {
+      const res = await fetch('/api/admin/cleanup-audio', { method: 'POST' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        showFeedback(data.error || `Errore (HTTP ${res.status}).`, 'err');
+        return;
+      }
+      const errs = Array.isArray(data.errors) && data.errors.length
+        ? ` ${data.errors.length} errori.`
+        : '';
+      showFeedback(
+        `Pulizia completata: ${data.deletedCount} file eliminati, ${data.dbCleared} record DB aggiornati.${errs}`,
+        data.errors?.length ? 'info' : 'ok',
+      );
+    } catch (err) {
+      showFeedback('Errore di rete. Riprova.', 'err');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
+  });
+</script>
+
 <style>
+  .cleanup-feedback {
+    margin: 0 0 1rem;
+    padding: 0.7rem 1rem;
+    border-radius: var(--a-radius-sm);
+    font-size: 0.88rem;
+    border: 1px solid var(--a-border);
+    line-height: 1.5;
+  }
+  .cleanup-ok  { background: rgba(34,197,94,0.10);  border-color: rgba(34,197,94,0.35);  color: #86efac; }
+  .cleanup-err { background: rgba(239,68,68,0.10);  border-color: rgba(239,68,68,0.35);  color: #fca5a5; }
+  .cleanup-info{ background: rgba(234,179,8,0.10);  border-color: rgba(234,179,8,0.35);  color: #fde68a; }
+
+  /* mobile-first: stats 2 col, scaling up */
   .stats {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
     margin-bottom: 1rem;
   }
   .stat {
@@ -155,24 +213,30 @@ function paymentLabel(m: string) {
     background: var(--a-surface);
     border: 1px solid var(--a-border);
     border-radius: var(--a-radius);
-    padding: 0.9rem 1rem;
+    padding: 0.75rem 0.9rem;
     box-shadow: var(--a-shadow);
     transition: border-color 0.2s, background 0.2s, transform 0.2s;
   }
-  .stat:hover { transform: translateY(-1px); border-color: rgba(139,92,246,0.35); }
+  .stat:active { transform: scale(0.98); }
+  .stat:hover { border-color: rgba(139,92,246,0.35); }
   .stat.active { border-color: rgba(139,92,246,0.55); background: rgba(139,92,246,0.10); }
   .v { font-size: 1.4rem; font-weight: 800; color: var(--a-text); line-height: 1; }
-  .k { margin-top: 0.35rem; font-size: 0.8rem; color: var(--a-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .k { margin-top: 0.35rem; font-size: 0.72rem; color: var(--a-muted); text-transform: uppercase; letter-spacing: 0.08em; }
   .v-attesa { color: var(--a-orange); }
   .v-lav { color: var(--a-blue); }
   .v-comp { color: var(--a-green); }
   .v-ann { color: var(--a-red); }
 
-  .empty-state { padding: 1rem 0; }
+  .empty-state { padding: 1.25rem; }
 
-  @media (max-width: 980px) {
-    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .a-table-wrap { overflow-x: auto; }
-    .a-table { min-width: 980px; }
+  @media (min-width: 560px) {
+    .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; }
+    .stat { padding: 0.9rem 1rem; }
+    .v { font-size: 1.5rem; }
+    .k { font-size: 0.78rem; }
+  }
+
+  @media (min-width: 980px) {
+    .stats { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   }
 </style>

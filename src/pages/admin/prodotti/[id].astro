@@ -89,19 +89,46 @@ function detailsText(details: string[]) {
         <label class="check"><input type="checkbox" name="is_active" value="1" checked={product.is_active} /> Attivo</label>
       </div>
 
-      <div class="actions">
-        <button class="btn btn-primary" type="submit">Salva</button>
+      <div class="actions sticky-cta">
+        <button class="btn btn-primary btn-full" type="submit">Salva</button>
       </div>
     </form>
   </div>
 </AdminLayout>
 
 <style>
-  .form{display:flex;flex-direction:column;gap:1rem}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-  .checks{display:flex;gap:1.25rem;flex-wrap:wrap}
-  .check{display:flex;gap:.5rem;align-items:center;color:var(--a-muted);font-size:.9rem}
-  .actions{display:flex;justify-content:flex-end}
-  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .form { display: flex; flex-direction: column; gap: 1rem; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+  .checks { display: flex; flex-direction: column; gap: 0.75rem; }
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: var(--a-tap);
+    color: var(--a-text);
+    font-size: 0.95rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--a-border);
+    border-radius: var(--a-radius-sm);
+    background: var(--a-surface-2);
+  }
+  .check input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--a-accent);
+  }
+  .actions { display: flex; }
+  @media (min-width: 720px) {
+    .grid { grid-template-columns: 1fr 1fr; }
+    .checks { flex-direction: row; gap: 1.25rem; flex-wrap: wrap; }
+    .check {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: var(--a-muted);
+      font-size: 0.9rem;
+    }
+    .actions .btn { width: auto; }
+  }
 </style>
 

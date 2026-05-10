@@ -328,9 +328,12 @@ if (Astro.request.method === 'POST') {
   });
 </script>
 
-<script type="application/json" id="products-json">
-  {JSON.stringify(allProducts.map((p) => ({ id: p.id, name: p.name, price: p.price })))}
-</script>
+<script
+  type="application/json"
+  id="products-json"
+  is:inline
+  set:html={JSON.stringify(allProducts.map((p) => ({ id: p.id, name: p.name, price: p.price })))}
+/>
 
 <style>
   .checkout-page {

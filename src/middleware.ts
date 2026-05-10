@@ -1,5 +1,8 @@
 import { defineMiddleware } from 'astro:middleware';
 import { getDb } from './lib/db';
+import { startAudioCleanupScheduler } from './lib/cleanup';
+
+startAudioCleanupScheduler();
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
