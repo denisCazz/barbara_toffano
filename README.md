@@ -1,43 +1,79 @@
-# Astro Starter Kit: Minimal
+# Barbara Toffano - Sito e Shop
 
-```sh
-npm create astro@latest -- --template minimal
+Applicazione Astro SSR per sito vetrina, shop, checkout e area admin ordini/prodotti.
+
+## Configurazione Base
+
+1. Installa dipendenze:
+
+```bash
+npm install
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+2. Crea ambiente locale:
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```bash
+cp .env.example .env
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+3. Imposta variabili principali in `.env`:
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+- `SITE_URL=https://barbaratoffano.it`
+- `RESEND_API_KEY=...`
+- `FROM_EMAIL=Barbara Toffano <noreply@barbaratoffano.it>`
+- `ADMIN_EMAIL=barbara@barbaratoffano.it`
 
-Any static assets, like images, can be placed in the `public/` directory.
+4. Avvia in sviluppo:
 
-## 🧞 Commands
+```bash
+npm run dev
+```
 
-All commands are run from the root of the project, from a terminal:
+## Notifiche Ordine
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+Quando arriva un ordine (`POST /api/checkout`):
 
-## 👀 Want to learn more?
+- viene inviata email di conferma cliente
+- viene inviata email notifica admin
+- opzionalmente viene inviato un webhook istantaneo
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Per webhook istantaneo imposta:
+
+- `ORDER_NOTIFICATION_WEBHOOK_URL=https://hook.example.com/order`
+
+Puoi passare piu URL separati da virgola o newline.
+
+Payload JSON inviato:
+
+- `event` (`order.created`)
+- `orderNumber`
+- `customerName`
+- `customerEmail`
+- `productName`
+- `amount`
+- `paymentMethod`
+- `paymentMethodLabel`
+- `adminUrl`
+- `createdAt`
+- `message`
+
+## PWA
+
+Il progetto e configurato come PWA installabile con:
+
+- manifest completo
+- service worker con auto update
+- cache pulizia automatica
+- metadata mobile (`theme-color`, `apple-web-app`)
+- icone dedicate in `public/icons/`
+
+## Comandi
+
+- `npm run dev` - avvia server sviluppo
+- `npm run build` - build produzione
+- `npm run preview` - preview build locale
+
+## Deploy
+
+- Dominio target: `barbaratoffano.it`
+- Imposta sempre `SITE_URL` in produzione con dominio pubblico senza slash finale.

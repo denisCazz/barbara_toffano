@@ -15,7 +15,7 @@ function getResend(): Resend {
 }
 
 const FROM = () => env('FROM_EMAIL') || 'Barbara Toffano <noreply@barbaratoffano.it>';
-const SITE = () => env('SITE_URL') || 'http://localhost:4321';
+const SITE = () => env('SITE_URL') || 'https://barbaratoffano.it';
 
 type PaymentMethod = 'paypal' | 'bonifico' | 'postepay' | 'non_specificato';
 
@@ -50,6 +50,24 @@ function paymentHtmlNote(method: PaymentMethod): string {
     default:
       return 'Ti contatteremo a breve con le istruzioni per completare il pagamento.';
   }
+}
+
+function parseWebhookUrls(): string[] {
+  const raw = env('ORDER_NOTIFICATION_WEBHOOK_URL') || '';
+  if (!raw.trim()) return [];
+
+  return raw
+    .split(/[\n,]/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .filter((s) => {
+      try {
+        const url = new URL(s);
+        return url.protocol === 'http:' || url.protocol === 'https:';
+      } catch {
+        return false;
+      }
+    });
 }
 
 /** Email conferma ordine al cliente */
@@ -112,13 +130,21 @@ export async function sendAdminNotification(
   paymentMethod: PaymentMethod = 'non_specificato',
 ): Promise<void> {
   const adminEmail = env('ADMIN_EMAIL');
-  if (!adminEmail) return;
+  const webhookUrls = parseWebhookUrls();
+  if (!adminEmail && webhookUrls.length === 0) return;
+
   const paymentMethodLabel = paymentLabel(paymentMethod);
-  await getResend().emails.send({
-    from: FROM(),
-    to: adminEmail,
-    subject: `🔔 Nuovo Ordine: ${orderNumber} — ${productName}`,
-    html: `
+  const subject = `🔔 Nuovo Ordine: ${orderNumber} — ${productName}`;
+
+  const jobs: Promise<unknown>[] = [];
+
+  if (adminEmail) {
+    jobs.push(
+      getResend().emails.send({
+        from: FROM(),
+        to: adminEmail,
+        subject,
+        html: `
 <!DOCTYPE html>
 <html lang="it">
 <body style="margin:0;padding:20px;background:#f5f5f5;font-family:Arial,sans-serif;color:#333;">
@@ -138,7 +164,39 @@ export async function sendAdminNotification(
   </div>
 </body>
 </html>`,
-  });
+      }),
+    );
+  }
+
+  for (const webhookUrl of webhookUrls) {
+    jobs.push(
+      fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event: 'order.created',
+          orderNumber,
+          customerName,
+          customerEmail,
+          productName,
+          amount,
+          paymentMethod,
+          paymentMethodLabel,
+          adminUrl: `${SITE()}/admin/dashboard`,
+          createdAt: new Date().toISOString(),
+          message: `Nuovo ordine ${orderNumber} da ${customerName} (${customerEmail}) - ${productName} - EUR ${amount.toFixed(2)} - pagamento: ${paymentMethodLabel}`,
+        }),
+      }).then((res) => {
+        if (!res.ok) {
+          throw new Error(`Webhook non riuscito (${res.status}) per ${webhookUrl}`);
+        }
+      }),
+    );
+  }
+
+  await Promise.all(jobs);
 }
 
 /** Email con link download audio al cliente */
