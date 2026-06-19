@@ -2,13 +2,45 @@
 import { getDb } from '../../lib/db';
 import { getProductById } from '../../lib/products';
 import { sendOrderConfirmation, sendAdminNotification } from '../../lib/email';
+import {
+  checkCheckoutSpam,
+  checkDuplicateOrder,
+  getClientIp,
+  logSpamBlock,
+  validateCheckoutInput,
+} from '../../lib/spam-guard';
+
+function rejectCheckout(reason: string): Response {
+  const params = new URLSearchParams({ error: reason });
+  return new Response(null, {
+    status: 302,
+    headers: { Location: `/checkout?${params}` },
+  });
+}
+
+function silentSuccess(): Response {
+  return new Response(null, {
+    status: 302,
+    headers: { Location: '/grazie?order=BT-CONFERMA' },
+  });
+}
 
 export const POST: APIRoute = async ({ request }) => {
+  const ip = getClientIp(request);
+
   let formData: FormData;
   try {
     formData = await request.formData();
   } catch {
     return new Response(null, { status: 302, headers: { Location: '/shop?error=1' } });
+  }
+
+  const spamCheck = checkCheckoutSpam(request, formData);
+  if (!spamCheck.allowed) {
+    logSpamBlock(spamCheck.reason, ip);
+    return spamCheck.action === 'silent_success'
+      ? silentSuccess()
+      : rejectCheckout('richiesta_non_valida');
   }
 
   const name          = (formData.get('name') as string | null)?.trim();
@@ -22,9 +54,21 @@ export const POST: APIRoute = async ({ request }) => {
       ? paymentMethodRaw
       : 'non_specificato';
 
-  // Validate
-  if (!name || !email || !productId || !email.includes('@')) {
-    return new Response(null, { status: 302, headers: { Location: '/checkout?error=dati_mancanti' } });
+  const inputCheck = validateCheckoutInput({ name: name ?? '', email: email ?? '', phone, notes });
+  if (!inputCheck.allowed) {
+    logSpamBlock(inputCheck.reason, ip, email ?? undefined);
+    if (inputCheck.reason === 'rate_email') {
+      return rejectCheckout('troppi_tentativi');
+    }
+    return rejectCheckout(
+      inputCheck.reason === 'invalid_name' || inputCheck.reason === 'invalid_email'
+        ? 'dati_mancanti'
+        : 'richiesta_non_valida',
+    );
+  }
+
+  if (!name || !email || !productId) {
+    return rejectCheckout('dati_mancanti');
   }
 
   const product = await getProductById(productId);
@@ -35,11 +79,16 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(null, { status: 302, headers: { Location: '/shop?error=prodotto_non_disponibile' } });
   }
 
-  // Generate order number
+  const db = getDb();
+  const duplicateCheck = await checkDuplicateOrder(db, email, productId);
+  if (!duplicateCheck.allowed) {
+    logSpamBlock(duplicateCheck.reason, ip, email);
+    return rejectCheckout('ordine_duplicato');
+  }
+
   const orderNumber = `BT-${Date.now().toString(36).toUpperCase()}`;
 
   try {
-    const db = getDb();
     await db.execute(
       `INSERT INTO orders
          (order_number, customer_name, customer_email, customer_phone,
@@ -60,10 +109,9 @@ export const POST: APIRoute = async ({ request }) => {
     );
   } catch (err) {
     console.error('DB error creating order:', err);
-    return new Response(null, { status: 302, headers: { Location: '/checkout?error=db' } });
+    return rejectCheckout('db');
   }
 
-  // Send emails (non-blocking)
   sendOrderConfirmation(email, name, orderNumber, product.name, product.price, paymentMethod).catch(console.error);
   sendAdminNotification(orderNumber, name, email, product.name, product.price, paymentMethod).catch(console.error);
 

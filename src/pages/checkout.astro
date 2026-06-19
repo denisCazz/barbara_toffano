@@ -66,6 +66,12 @@ if (Astro.request.method === 'POST') {
         <input type="hidden" name="product_id" id="hidden-product-id"
           value={selectedProduct?.id?.toString() ?? ''} />
         <input type="hidden" name="payment_method" id="hidden-payment" value="" />
+        <input type="hidden" name="form_ts" id="form-ts" value="" />
+        <!-- Honeypot: nascosto ai visitatori reali, i bot lo compilano -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="website">Sito web</label>
+          <input type="text" name="website" id="website" tabindex="-1" autocomplete="off" />
+        </div>
 
         <!-- ── STEP 1: Prodotto ── -->
         <div class="step-panel" id="panel-1">
@@ -125,19 +131,22 @@ if (Astro.request.method === 'POST') {
             <div class="form-grid">
               <div class="form-group">
                 <label for="name">Nome e Cognome <span class="req">*</span></label>
-                <input type="text" id="name" name="name" required placeholder="Es. Maria Rossi" autocomplete="name" />
+                <input type="text" id="name" name="name" required maxlength="100"
+                  placeholder="Es. Maria Rossi" autocomplete="name" />
               </div>
               <div class="form-group">
                 <label for="email">Email <span class="req">*</span></label>
-                <input type="email" id="email" name="email" required placeholder="maria@email.it" autocomplete="email" />
+                <input type="email" id="email" name="email" required maxlength="255"
+                  placeholder="maria@email.it" autocomplete="email" />
               </div>
               <div class="form-group">
                 <label for="phone">Telefono / WhatsApp</label>
-                <input type="tel" id="phone" name="phone" placeholder="+39 333 123 4567" autocomplete="tel" />
+                <input type="tel" id="phone" name="phone" maxlength="30"
+                  placeholder="+39 333 123 4567" autocomplete="tel" />
               </div>
               <div class="form-group full">
                 <label for="notes">Domande o note per Barbara</label>
-                <textarea id="notes" name="notes" rows="4"
+                <textarea id="notes" name="notes" rows="4" maxlength="2000"
                   placeholder="Raccontami brevemente di cosa hai bisogno o cosa vorresti sapere..."></textarea>
               </div>
             </div>
@@ -250,6 +259,23 @@ if (Astro.request.method === 'POST') {
 </Layout>
 
 <script>
+  const formTsInput = document.getElementById('form-ts') as HTMLInputElement | null;
+  if (formTsInput) formTsInput.value = String(Date.now());
+
+  const checkoutError = new URLSearchParams(window.location.search).get('error');
+  if (checkoutError) {
+    const messages: Record<string, string> = {
+      dati_mancanti: 'Controlla nome e email e riprova.',
+      ordine_duplicato: 'Hai già inviato una richiesta per questo prodotto di recente. Controlla la tua email o riprova più tardi.',
+      troppi_tentativi: 'Troppi tentativi in poco tempo. Attendi qualche minuto e riprova.',
+      richiesta_non_valida: 'Non è stato possibile inviare la richiesta. Ricarica la pagina e riprova.',
+      timing_expired: 'La sessione è scaduta. Ricarica la pagina e riprova.',
+      db: 'Errore temporaneo. Riprova tra qualche minuto.',
+    };
+    const msg = messages[checkoutError] ?? 'Si è verificato un errore. Riprova.';
+    alert(msg);
+  }
+
   const selectedProductId = new URLSearchParams(window.location.search).get('product');
 
   // ── Product data (for picker summary) ──
@@ -582,6 +608,17 @@ if (Astro.request.method === 'POST') {
     color: var(--accent);
     font-size: 1rem;
     font-weight: 600;
+  }
+
+  /* Honeypot — fuori schermo, non focusabile */
+  .hp-field {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
   }
 
   /* ── Form fields ── */
