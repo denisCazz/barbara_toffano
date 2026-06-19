@@ -1,11 +1,24 @@
 import { defineMiddleware } from 'astro:middleware';
 import { getDb } from './lib/db';
 import { startAudioCleanupScheduler } from './lib/cleanup';
+import { getClientIp } from './lib/spam-guard';
+import { isRateLimited } from './lib/ratelimit';
 
 startAudioCleanupScheduler();
 
+const CHECKOUT_BURST_LIMIT = 10;
+const CHECKOUT_BURST_WINDOW_MS = 5 * 60 * 1000;
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
+
+  if (pathname === '/api/checkout' && context.request.method === 'POST') {
+    const ip = getClientIp(context.request);
+    if (ip !== 'unknown' && isRateLimited(`checkout:burst:${ip}`, CHECKOUT_BURST_LIMIT, CHECKOUT_BURST_WINDOW_MS)) {
+      console.warn('[spam-guard] checkout burst limit', { ip });
+      return context.redirect('/checkout?error=troppi_tentativi');
+    }
+  }
 
   // Proteggi tutte le rotte /admin/* tranne /admin/login
   if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
